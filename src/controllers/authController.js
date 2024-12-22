@@ -1,10 +1,11 @@
 import fetch from "node-fetch";
+import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../config/config";
 
-let accessToken = process.env.ACCESS_TOKEN;
-let refreshToken = process.env.REFRESH_TOKEN;
+let accessToken = '';
+let refreshToken = '';
 
 export const getAuthUrl = (req, res) => {
-  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}`;
+  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}`;
   console.log(authUrl,'authUrl')
   res.json({ authUrl });
 };
@@ -18,10 +19,10 @@ export const callback = async (req, res) => {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         grant_type: "authorization_code",
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
         code,
-        redirect_uri: process.env.REDIRECT_URI,
+        redirect_uri: REDIRECT_URI,
       }),
     });
 
