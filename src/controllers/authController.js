@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../config/config";
+import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../config/config.js";
 
 let accessToken = '';
 let refreshToken = '';
