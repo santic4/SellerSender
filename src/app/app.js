@@ -10,6 +10,7 @@ import templateRoutes from '../routes/templateRoutes.js';
 import messagesRoutes from '../routes/messagesRoutes.js'
 
 dotenv.config();
+
 const app = express();
 
 app.use(express.static(path.join('public', 'build')));
