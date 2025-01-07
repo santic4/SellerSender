@@ -9,7 +9,8 @@ import fetch from "node-fetch";
  * Controlador para obtener mensajes pendientes.
  * @param {object} req Objeto de solicitud.
  * @param {object} res Objeto de respuesta.
- */
+*/
+
 export const getMessages = async (req, res) => {
   const { code } = req.query; 
 
@@ -24,8 +25,6 @@ export const getMessages = async (req, res) => {
     // Obtener los mensajes pendientes
     const messages = await fetchPendingMessages(token);
 
-    console.log(messages,'message')
-    // Almacenar mensajes en la base de datos
     if (messages.length > 0) {
       await Message.insertMany(messages, { ordered: false });
     }
