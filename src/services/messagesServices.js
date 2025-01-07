@@ -7,6 +7,8 @@ export const fetchPendingMessages = async (token) => {
 
     try {
 
+        console.log(token,'token')
+        console.log(token.accessToken,'token.accessToken')
       const response = await fetch("https://api.mercadolibre.com/messages/pending", {
         headers: { Authorization: `Bearer ${token.accessToken}` },
       });
