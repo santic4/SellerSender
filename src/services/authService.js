@@ -23,6 +23,7 @@ export const requestTokens = async (code) => {
       }),
     });
 
+    console.log('pase request token en auth services ')
     if (!response.ok) {
       const errorBody = await response.json();
       console.error("Error al obtener los tokens:", errorBody);
