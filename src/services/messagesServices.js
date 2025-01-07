@@ -18,11 +18,9 @@ export const fetchPendingMessages = async (token) => {
 
       const data = await response.json();
 
-      console.log(data,'data')
-      
-      return data.messages?.map((msg) => ({
+      return data.questions?.map((msg) => ({
         message_id: msg.id,
-        sender_name: msg.from.nickname,
+        sender_name: msg.seller_id,
         text: msg.text,
       })) || [];
     } catch (error) {
