@@ -4,12 +4,9 @@
  * @returns {Promise<object[]>} Lista de mensajes.
  */
 export const fetchPendingMessages = async (token) => {
-
+    
     try {
-
-        console.log(token,'token')
-        console.log(token.accessToken,'token.accessToken')
-      const response = await fetch("https://api.mercadolibre.com/messages/pending", {
+      const response = await fetch("https://api.mercadolibre.com/my/received_questions/unanswered", {
         headers: { Authorization: `Bearer ${token.accessToken}` },
       });
   
