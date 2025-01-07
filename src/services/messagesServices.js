@@ -4,15 +4,18 @@
  * @returns {Promise<object[]>} Lista de mensajes.
  */
 export const fetchPendingMessages = async (token) => {
+
     try {
+
       const response = await fetch("https://api.mercadolibre.com/messages/pending", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token.accessToken}` },
       });
   
       if (!response.ok) {
         console.error("Error en la respuesta de la API:", response.status, response.statusText);
         throw new Error("Error al consultar la API de Mercado Libre");
       }
+      console.log(response,'RESPONSE MESSAGES SERVICES')
   
       const data = await response.json();
       return data.messages?.map((msg) => ({

@@ -17,7 +17,6 @@ export const getMessages = async (req, res) => {
     // Obtener un token de acceso válido
     const token = await requestTokens(code);
 
-    console.log(token,'token')
     if(!token){
       throw new Error('No existe el token.');
     }

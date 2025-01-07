@@ -22,8 +22,6 @@ export const requestTokens = async (code) => {
         redirect_uri: REDIRECT_URI,
       }),
     });
-
-    console.log('pase request token en auth services ')
     if (!response.ok) {
       const errorBody = await response.json();
       console.error("Error al obtener los tokens:", errorBody);
