@@ -15,6 +15,7 @@ export const fetchPendingMessages = async (token) => {
         console.error("Error en la respuesta de la API:", response.status, response.statusText);
         throw new Error("Error al consultar la API de Mercado Libre");
       }
+      
       console.log(response,'RESPONSE MESSAGES SERVICES')
   
       const data = await response.json();

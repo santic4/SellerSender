@@ -24,11 +24,10 @@ export const getMessages = async (req, res) => {
     // Obtener los mensajes pendientes
     const messages = await fetchPendingMessages(token);
 
+    console.log(messages,'message')
     // Almacenar mensajes en la base de datos
     if (messages.length > 0) {
       await Message.insertMany(messages, { ordered: false });
-    }else{
-      throw new Error('Los mensajes son 0.')
     }
 
     res.json(messages);
