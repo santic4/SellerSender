@@ -4,9 +4,10 @@
  * @returns {Promise<object[]>} Lista de mensajes.
  */
 export const fetchPendingMessages = async (token) => {
-    
+
     try {
-      const response = await fetch("https://api.mercadolibre.com/my/received_questions/unanswered", {
+
+      const response = await fetch("https://api.mercadolibre.com/my/received_questions/search?status=UNANSWERED&limit=50&offset=0&api_version=4", {
         headers: { Authorization: `Bearer ${token.accessToken}` },
       });
   
