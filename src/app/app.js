@@ -5,14 +5,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { connectDB } from '../config/db.js';
-import authRoutes from '../routes/authRouter.js'
-import templateRoutes from '../routes/templateRoutes.js';
-import messagesRoutes from '../routes/messagesRoutes.js'
+import cookieParser from 'cookie-parser';
+import router from '../router/authRouter.js';
 
 dotenv.config();
 
 const app = express();
 
+app.use(cookieParser());
 app.use(express.static(path.join('public', 'build')));
 
 app.use(cors({
@@ -48,9 +48,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Rutas
-app.use('/api/auth', authRoutes);
-app.use("/api/messages", messagesRoutes);
-app.use('/api/templates', templateRoutes);
+app.use('/api', router);
 
 
 // Configura el middleware de archivos estáticos
