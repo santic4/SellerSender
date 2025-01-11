@@ -3,8 +3,29 @@ import { Product } from "../models/Product.js";
 import { productServices } from "../services/productsServices.js";
 import { userServices } from "../services/usersServices.js";
 
-export const getProductsController = async (req, res) => {
+export const getProductsController = async (req, res, next) => {
   const { accessToken } = req.cookies; 
+  console.log('antes accessToken')
+  if (!accessToken) {
+    return res.status(401).json({ error: "No estás autenticado" });
+  }
+  console.log('despuest access')
+  try {
+    const userID = await userServices.getInfoUserServices(accessToken);
+
+    console.log(userID,'userID')
+    const productsData = await productServices.getProductsServices(accessToken, userID)
+    console.log(productsData,'productsData')
+    const detailsProducts = await productServices.getDetailsProduct(accessToken, productsData);
+    console.log(detailsProducts,'detailsProducts')
+    res.status(200).json(detailsProducts);
+  } catch (error) {
+    next()
+  }
+}
+
+export const test = async (req, res, next) => {
+  const { accessToken } = req.body; 
 
   if (!accessToken) {
     return res.status(401).json({ error: "No estás autenticado" });
@@ -13,18 +34,18 @@ export const getProductsController = async (req, res) => {
   try {
     const userID = await userServices.getInfoUserServices(accessToken);
 
+    console.log(userID,'userID')
     const productsData = await productServices.getProductsServices(accessToken, userID)
-
+    console.log(productsData,'productsData')
     const detailsProducts = await productServices.getDetailsProduct(accessToken, productsData);
-
+    console.log(detailsProducts,'detailsProducts')
     res.status(200).json(detailsProducts);
   } catch (error) {
-    console.error("Error al obtener productos:", error.message);
-    res.status(500).json({ error: "Error interno del servidor" });
+    next()
   }
 }
 
-export const asignTemplate = async (req, res) => {
+export const asignTemplate = async (req, res, next) => {
 
   const { productId } = req.params;
   const { templateIds } = req.body;
@@ -45,7 +66,6 @@ export const asignTemplate = async (req, res) => {
 
     res.json(product);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error al asignar plantillas al producto." });
+    next()
   }
 }
