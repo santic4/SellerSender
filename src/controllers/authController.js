@@ -11,11 +11,12 @@ export const callback = async (req, res) => {
   const { code } = req.query;
 
   try {
-    const response = await fetch("https://api.mercadolibre.com/oauth/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    // Intercambio del código de autorización por tokens
+    const response = await fetch('https://api.mercadolibre.com/oauth/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        grant_type: "authorization_code",
+        grant_type: 'authorization_code',
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
         code,
@@ -24,27 +25,31 @@ export const callback = async (req, res) => {
     });
 
     if (!response.ok) {
-      console.error("Error al obtener el token:", response.statusText);
-      return res.status(response.status).json({ error: "No se pudo autenticar" });
+      console.error('Error al obtener el token:', response.statusText);
+      return res.status(response.status).json({ error: 'No se pudo autenticar' });
     }
 
     const data = await response.json();
-    const { access_token, refresh_token, expires_in } = data;
+    const { access_token, refresh_token } = data;
 
-    // Guardar en cookies HttpOnly
-    const cookieOptions = {
+    // Guardar los tokens en cookies HttpOnly
+    res.cookie('accessToken', access_token, {
       httpOnly: true,
       secure: true,
-      maxAge: expires_in * 1000, // Tiempo de expiración en milisegundos
-    };
+      maxAge: 3600000, // 1 hora
+      sameSite: 'Strict',
+    });
+    res.cookie('refreshToken', refresh_token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 3600000, // 1 hora
+      sameSite: 'Strict',
+    });
 
-    res.cookie("accessToken", access_token, cookieOptions);
-    res.cookie("refreshToken", refresh_token, { ...cookieOptions, maxAge: 30 * 24 * 60 * 60 * 1000 }); // Máximo para refresh token
-
-    res.json({ message: "Autenticación completada", accessToken: access_token });
+    res.json({ message: 'Autenticación completada', accessToken: access_token });
   } catch (error) {
-    console.error("Error al autenticar:", error.message);
-    res.status(500).json({ error: "No se pudo autenticar" });
+    console.error('Error al autenticar:', error.message);
+    res.status(500).json({ error: 'No se pudo autenticar' });
   }
 };
 

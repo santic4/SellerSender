@@ -6,9 +6,9 @@ import paymentsRouter from './paymentsRouter.js'
 
 const router = express.Router();
 
-router.use('/api', authRouter);
-router.use("/api", messagesRouter);
-router.use('/api', templateRouter);
-router.use('/api', paymentsRouter);
+router.use('/auth', authRouter);
+router.use("/messages", messagesRouter);
+router.use('/templates', templateRouter);
+router.use('/payments', paymentsRouter);
 
 export default router;
