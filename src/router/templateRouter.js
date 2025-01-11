@@ -3,7 +3,8 @@ import { createTemplate, getTemplates } from "../controllers/templateController.
 
 const templateRouter = express.Router();
 
-templateRouter.post("/", createTemplate);
 templateRouter.get("/", getTemplates);
+templateRouter.post("/", createTemplate);
+
 
 export default templateRouter;
