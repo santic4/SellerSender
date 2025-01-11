@@ -1,26 +1,21 @@
+import { productServices } from "../services/productsServices.js";
+import { userServices } from "../services/usersServices.js";
+
 export const getProductsController = async (req, res) => {
   const { accessToken } = req.cookies; 
-  console.log(accessToken,'llegue a get controller')
+
   if (!accessToken) {
     return res.status(401).json({ error: "No estás autenticado" });
   }
-  console.log('pase la verificación')
+
   try {
-    const response = await fetch("https://api.mercadolibre.com/users/me/items/search", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    console.log(response,'response')
-    if (!response.ok) {
-      return res.status(response.status);
-    }
+    const userID = await userServices.getInfoUserServices(accessToken);
 
-    const data = await response.json();
+    const productsData = await productServices.getProductsServices(accessToken, userID)
 
-    console.log(data,'data en get controller')
-    res.json(data.results);
+    const detailsProducts = await productServices.getDetailsProduct(accessToken, productsData);
+
+    res.status(200).json(detailsProducts);
   } catch (error) {
     console.error("Error al obtener productos:", error.message);
     res.status(500).json({ error: "Error interno del servidor" });
