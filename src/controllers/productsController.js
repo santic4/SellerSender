@@ -4,7 +4,7 @@ export const getProductsController = async (req, res) => {
   if (!accessToken) {
     return res.status(401).json({ error: "No estás autenticado" });
   }
-
+  console.log('pase la verificación')
   try {
     const response = await fetch("https://api.mercadolibre.com/users/me/items/search", {
       method: "GET",
@@ -12,7 +12,7 @@ export const getProductsController = async (req, res) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-
+    console.log(response,'response')
     if (!response.ok) {
       return res.status(response.status);
     }
