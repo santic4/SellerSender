@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { connectDB } from '../config/db.js';
 import cookieParser from 'cookie-parser';
-import router from '../router/authRouter.js';
+import apiRouter from '../router/apiRouter.js';
 
 dotenv.config();
 
@@ -48,7 +48,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Rutas
-app.use('/api', router);
+app.use('/api', apiRouter);
 
 
 // Configura el middleware de archivos estáticos
