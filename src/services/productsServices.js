@@ -57,10 +57,11 @@ class ProductServices{
             console.log(productDetailsPromises,'productDetailsPromises')
           
             const productDetails = await Promise.all(productDetailsPromises);
-            console.log(productDetails,'productDetails')
+     
             const productsSummary = productDetails.map(product => ({
               title: product.title,
-              site_id: product.site_id
+              site_id: product.site_id,
+              id: product.id
             }));
         
             return productsSummary; 

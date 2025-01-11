@@ -1,9 +1,9 @@
 import express from "express";
-import { getProductsController, test } from "../controllers/productsController.js";
+import { asignTemplate, getProductsController, } from "../controllers/productsController.js";
 
 const productsRouter = express.Router();
 
 productsRouter.get('/', getProductsController);
-productsRouter.post('/:productId/assign-templates', );
+productsRouter.post('/:productId/assign-templates', asignTemplate);
 
 export default productsRouter;

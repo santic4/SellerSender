@@ -13,32 +13,11 @@ export const getProductsController = async (req, res, next) => {
   try {
     const userID = await userServices.getInfoUserServices(accessToken);
 
-    console.log(userID,'userID')
+
     const productsData = await productServices.getProductsServices(accessToken, userID)
-    console.log(productsData,'productsData')
+
     const detailsProducts = await productServices.getDetailsProduct(accessToken, productsData);
-    console.log(detailsProducts,'detailsProducts')
-    res.status(200).json(detailsProducts);
-  } catch (error) {
-    next()
-  }
-}
 
-export const test = async (req, res, next) => {
-  const { accessToken } = req.body; 
-
-  if (!accessToken) {
-    return res.status(401).json({ error: "No estás autenticado" });
-  }
-
-  try {
-    const userID = await userServices.getInfoUserServices(accessToken);
-
-    console.log(userID,'userID')
-    const productsData = await productServices.getProductsServices(accessToken, userID)
-    console.log(productsData,'productsData')
-    const detailsProducts = await productServices.getDetailsProduct(accessToken, productsData);
-    console.log(detailsProducts,'detailsProducts')
     res.status(200).json(detailsProducts);
   } catch (error) {
     next()
@@ -51,7 +30,8 @@ export const asignTemplate = async (req, res, next) => {
   const { templateIds } = req.body;
 
   try {
-    // Verificar si los templateIds son válidos
+
+    console.log('enter al asign complete ')
     const templates = await Template.find({ '_id': { $in: templateIds } });
     if (templates.length !== templateIds.length) {
       return res.status(400).json({ message: "Algunas plantillas no son válidas." });
