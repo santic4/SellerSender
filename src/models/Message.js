@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose'
 
-const messageSchema = new mongoose.Schema({
+const messageSchema = new Schema({
   userId: { type: String, required: true },
   publicationId: { type: String, required: true },
   content: { type: String, required: true },
@@ -8,4 +8,4 @@ const messageSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model('Message', messageSchema);
+export const Message = model('Message', messageSchema);

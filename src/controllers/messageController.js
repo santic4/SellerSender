@@ -1,4 +1,4 @@
-import Message from "../models/Message.js";
+import { Message } from '../models/Message.js';
 import { requestTokens } from "../services/authService.js";
 import { fetchPendingMessages } from "../services/messagesServices.js";
 import { getAccessToken, refreshAccessToken } from "./authController.js";

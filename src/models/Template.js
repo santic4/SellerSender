@@ -1,9 +1,12 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose'
 
-const templateSchema = new mongoose.Schema({
+const templateSchema = new Schema({
   name: { type: String, required: true },
   content: { type: String, required: true, maxLength: 350 },
   assignedPublications: [{ type: String }],
-});
+},{
+  strict: 'throw',
+  versionKey: false,
+})
 
-export default mongoose.model('Template', templateSchema);
+export const Template = model('Template', templateSchema);

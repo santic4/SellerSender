@@ -1,4 +1,4 @@
-import Template from '../models/Template.js';
+import { Template } from '../models/Template.js';
 
 export const createTemplate = async (req, res) => {
   const { name, content, assignedPublications } = req.body;
