@@ -21,6 +21,7 @@ class ProductServices{
               throw new Error('Error en la respuesta de Mercado Libre al obtener productos.')
           }
       
+          console.log(responseProducts,'response products en product services')
           const data = await responseProducts.json();
       
         return data;
@@ -52,9 +53,11 @@ class ProductServices{
 
               return productData; 
             });
+
+            console.log(productDetailsPromises,'productDetailsPromises')
           
             const productDetails = await Promise.all(productDetailsPromises);
-                
+            console.log(productDetails,'productDetails')
             const productsSummary = productDetails.map(product => ({
               title: product.title,
               site_id: product.site_id
