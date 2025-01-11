@@ -7,6 +7,6 @@ authRouter.get("/url", getAuthUrl);
 
 authRouter.get('/callback', callback);
 
-authRouter.get("/auth/check", checkAuth);
+authRouter.get("/check", checkAuth);
 
 export default authRouter;
