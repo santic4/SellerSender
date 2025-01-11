@@ -30,6 +30,7 @@ export const callback = async (req, res) => {
     }
 
     const data = await response.json();
+    console.log(data,'data en callback')
     const { access_token, refresh_token } = data;
 
     // Guardar los tokens en cookies HttpOnly
@@ -46,10 +47,29 @@ export const callback = async (req, res) => {
       sameSite: 'Strict',
     });
 
-    res.json({ message: 'Autenticación completada', accessToken: access_token });
+    res.redirect('/');
   } catch (error) {
     console.error('Error al autenticar:', error.message);
     res.status(500).json({ error: 'No se pudo autenticar' });
+  }
+};
+
+export const checkAuth = async (req, res) => {
+  const token = req.cookies.accessToken;
+
+  if (!token) {
+    return res.status(401).json({ isAuthenticated: false });
+  }
+
+  try {
+    // Verificar el token (puedes usar una librería JWT si es necesario)
+    // Asegúrate de manejar errores y tokens expirados de forma segura
+    console.log(token,'token en check')
+
+    res.status(200).json({ isAuthenticated: true });
+  } catch (error) {
+    console.error("Error al validar el token:", error.message);
+    res.status(401).json({ isAuthenticated: false });
   }
 };
 
