@@ -21,7 +21,7 @@ export const callback = async (req, res) => {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
         code,
-        redirect_uri: 'https://sellersender.onrender.com/api/auth/callback',
+        redirect_uri: REDIRECT_URI,
       }),
     });
 
