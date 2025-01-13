@@ -32,7 +32,7 @@ export const asignTemplate = async (req, res, next) => {
 
     console.log(templateIds,'template,ids')
     const templates = await Template.find({ '_id': { $in: templateIds } });
-
+    console.log(templateIds,'template,ids despues')
     if (templates.length !== templateIds.length) {
       return res.status(400).json({ message: "Algunas plantillas no son válidas." });
     }
