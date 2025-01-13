@@ -48,7 +48,7 @@ export const asignTemplate = async (req, res, next) => {
     if (!product) {
       console.log('el producto no existe')
       product = new Product({
-        productId: id,
+        id: id,
         templates: templateObjects,
       });
       console.log(product, 'el producto creado')
