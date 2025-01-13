@@ -4,6 +4,6 @@ import { asignTemplate, getProductsController, } from "../controllers/productsCo
 const productsRouter = express.Router();
 
 productsRouter.get('/', getProductsController);
-productsRouter.post('/:productId/assign-templates', asignTemplate);
+productsRouter.post('/:id/assign-templates', asignTemplate);
 
 export default productsRouter;

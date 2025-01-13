@@ -26,7 +26,7 @@ export const getProductsController = async (req, res, next) => {
 
 export const asignTemplate = async (req, res, next) => {
 
-  const { productId } = req.params;
+  const { id } = req.params;
   const { templateIds } = req.body;
 
   try {
@@ -39,8 +39,8 @@ export const asignTemplate = async (req, res, next) => {
 
     // Asignar las plantillas al producto
     const product = await Product.findByIdAndUpdate(
-      productId,
-      { $addToSet: { templates: { $each: templateIds } } }, // Evitar duplicados con $addToSet
+      id,
+      { $addToSet: { templates: { $each: templateIds } } }, 
       { new: true }
     );
 
