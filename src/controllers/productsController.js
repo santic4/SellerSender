@@ -43,12 +43,16 @@ export const asignTemplate = async (req, res, next) => {
 
     let product = await Product.findOne({ productId: id });
 
+
     if (!product) {
+      console.log('el producto no existe')
       product = new Product({
         productId: id,
         templates: templateObjects,
       });
+      console.log(product, 'el producto creado')
     } else {
+      console.log(product, 'el producto existe')
       // Si el producto existe, combinar las plantillas existentes con las nuevas
       const existingTemplates = product.templates.map(t => t.templateId.toString());
       const newTemplates = templateObjects.filter(t => !existingTemplates.includes(t.templateId.toString()));
@@ -56,6 +60,7 @@ export const asignTemplate = async (req, res, next) => {
       product.templates = [...product.templates, ...newTemplates];
     }
 
+    console.log(product, 'antes del save')
     await product.save();
 
     res.status(200).json(product);
