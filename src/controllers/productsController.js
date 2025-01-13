@@ -30,6 +30,7 @@ export const asignTemplate = async (req, res, next) => {
 
   try {
 
+    console.log(templateIds,'template,ids')
     const templates = await Template.find({ '_id': { $in: templateIds } });
 
     if (templates.length !== templateIds.length) {
