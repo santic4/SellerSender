@@ -1,9 +1,9 @@
 import { Schema, model } from 'mongoose';
 
 const productSchema = new Schema({
-  id: { type: String, required: true, unique: true }, // ID del producto de Mercado Libre
-  title: { type: String }, // Opcional: Nombre del producto si lo necesitas
-  site_id: { type: String }, // Opcional: ID del sitio si aplica
+  id: { type: String, required: true, unique: true }, 
+  title: { type: String },
+  site_id: { type: String }, 
   templates: [
     {
       templateId: { type: Schema.Types.ObjectId, ref: "Template" },
