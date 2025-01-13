@@ -42,7 +42,7 @@ export const asignTemplate = async (req, res, next) => {
       name: template.name,
     }));
 
-    let product = await Product.findOne({ productId: id });
+    let product = await Product.findOne({ id: id });
 
 
     if (!product) {
