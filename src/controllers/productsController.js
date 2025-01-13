@@ -93,7 +93,6 @@ export const deleteTemplate = async (req, res, next) => {
       return res.status(404).json({ message: "Producto no encontrado." });
     }
 
- const sdfA = templateId.
     product.templates = product.templates.filter((template) => template.templateId.toString() !== templateId);
 
     console.log(product,'product COSA')
