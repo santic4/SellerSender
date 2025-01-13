@@ -75,6 +75,7 @@ export const asignTemplate = async (req, res, next) => {
 export const getSavedProducts = async (req, res, next) => {
   try {
     const products = await Product.find().populate("templates.templateId");
+    console.log(getSavedProducts,'get saved productos')
     res.status(200).json(products);
   } catch (error) {
     next(error);
