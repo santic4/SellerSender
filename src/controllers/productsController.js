@@ -85,13 +85,18 @@ export const getSavedProducts = async (req, res, next) => {
 export const deleteTemplate = async (req, res, next) => {
   const { productId, templateId } = req.params;
 
+  console.log(productId,'COSA',templateId,)
   try {
     const product = await Product.findOne({ id: productId });
+
     if (!product) {
       return res.status(404).json({ message: "Producto no encontrado." });
     }
 
+
     product.templates = product.templates.filter((template) => template.templateId.toString() !== templateId);
+
+    console.log(product,'product COSA')
     await product.save();
 
     res.status(200).json({ message: "Plantilla eliminada correctamente." });
