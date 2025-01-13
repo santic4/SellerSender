@@ -86,7 +86,6 @@ export const deleteTemplate = async (req, res, next) => {
   const { productId, templateId } = req.params;
 
   console.log(productId,'COSA',templateId,)
-  console.log(`Objeto completo: ${JSON.stringify(templateId, null, 2)}`);
   try {
     const product = await Product.findOne({ id: productId });
 
@@ -94,7 +93,7 @@ export const deleteTemplate = async (req, res, next) => {
       return res.status(404).json({ message: "Producto no encontrado." });
     }
 
-
+ const sdfA = templateId.
     product.templates = product.templates.filter((template) => template.templateId.toString() !== templateId);
 
     console.log(product,'product COSA')
