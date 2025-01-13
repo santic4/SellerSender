@@ -75,7 +75,7 @@ export const asignTemplate = async (req, res, next) => {
 export const getSavedProducts = async (req, res, next) => {
   try {
     const products = await Product.find().populate("templates.templateId");
-    console.log(getSavedProducts,'get saved productos')
+
     res.status(200).json(products);
   } catch (error) {
     next(error);
@@ -86,6 +86,7 @@ export const deleteTemplate = async (req, res, next) => {
   const { productId, templateId } = req.params;
 
   console.log(productId,'COSA',templateId,)
+  console.log(`Objeto completo: ${JSON.stringify(templateId, null, 2)}`);
   try {
     const product = await Product.findOne({ id: productId });
 
