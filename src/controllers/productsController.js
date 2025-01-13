@@ -36,21 +36,28 @@ export const asignTemplate = async (req, res, next) => {
       return res.status(400).json({ message: "Algunas plantillas no son válidas." });
     }
 
+    const templateObjects = templates.map(template => ({
+      templateId: template._id,
+      name: template.name,
+    }));
+
     let product = await Product.findOne({ productId: id });
 
     if (!product) {
-
       product = new Product({
         productId: id,
-        templates: templateIds,
+        templates: templateObjects,
       });
     } else {
-      product.templates = [...new Set([...product.templates, ...templateIds])];
+      // Si el producto existe, combinar las plantillas existentes con las nuevas
+      const existingTemplates = product.templates.map(t => t.templateId.toString());
+      const newTemplates = templateObjects.filter(t => !existingTemplates.includes(t.templateId.toString()));
+
+      product.templates = [...product.templates, ...newTemplates];
     }
 
     await product.save();
 
-    console.log(product,'product')
     res.status(200).json(product);
 
     res.json(product);
