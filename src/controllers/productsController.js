@@ -5,14 +5,13 @@ import { userServices } from "../services/usersServices.js";
 
 export const getProductsController = async (req, res, next) => {
   const { accessToken } = req.cookies; 
-  console.log('antes accessToken')
+
   if (!accessToken) {
     return res.status(401).json({ error: "No estás autenticado" });
   }
-  console.log('despuest access')
+
   try {
     const userID = await userServices.getInfoUserServices(accessToken);
-
 
     const productsData = await productServices.getProductsServices(accessToken, userID)
 
@@ -31,18 +30,28 @@ export const asignTemplate = async (req, res, next) => {
 
   try {
 
-    console.log('enter al asign complete ')
     const templates = await Template.find({ '_id': { $in: templateIds } });
+
     if (templates.length !== templateIds.length) {
       return res.status(400).json({ message: "Algunas plantillas no son válidas." });
     }
 
-    // Asignar las plantillas al producto
-    const product = await Product.findByIdAndUpdate(
-      id,
-      { $addToSet: { templates: { $each: templateIds } } }, 
-      { new: true }
-    );
+    let product = await Product.findOne({ productId: id });
+
+    if (!product) {
+
+      product = new Product({
+        productId: id,
+        templates: templateIds,
+      });
+    } else {
+      product.templates = [...new Set([...product.templates, ...templateIds])];
+    }
+
+    await product.save();
+
+    console.log(product,'product')
+    res.status(200).json(product);
 
     res.json(product);
   } catch (error) {

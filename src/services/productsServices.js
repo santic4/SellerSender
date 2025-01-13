@@ -54,8 +54,7 @@ class ProductServices{
               return productData; 
             });
 
-            console.log(productDetailsPromises,'productDetailsPromises')
-          
+
             const productDetails = await Promise.all(productDetailsPromises);
      
             const productsSummary = productDetails.map(product => ({
