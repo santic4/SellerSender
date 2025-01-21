@@ -1,5 +1,7 @@
 import fetch from 'node-fetch';
 import { getAccessToken } from './authService.js';
+import { Template } from '../models/Template.js';
+import { Product } from '../models/Product.js';
 
 /**
  * Procesa una notificación del webhook de Mercado Libre.
@@ -7,20 +9,47 @@ import { getAccessToken } from './authService.js';
  * @param {string} resource - URL del recurso asociado a la notificación.
  * @returns {object} - Datos procesados del recurso.
  */
+
 export const processWebhookNotification = async (topic, resource) => {
   try {
 
-    // Obtén el ID de la orden desde el recurso
     const orderId = resource.split('/').pop();
 
-    // Llama al servicio de Mercado Libre para obtener los detalles de la orden
+    console.log('1 webhook services')
     const orderDetails = await fetchOrderDetails(orderId);
 
-    // Extrae el ID del ítem vendido
-    const itemId = orderDetails.order_items[0].item.id;
+    console.log(orderDetails,'2 webhook services')
 
-    // Devuelve los detalles procesados
-    return { orderId, itemId };
+    const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
+
+      const product = await Product.findOne({ id: item.item.id });
+
+      const templatesWithContent = await Promise.all(product.templates.map(async (template) => {
+
+        const templateDetails = await Template.findById(template.templateId);
+
+        return {
+          name: template.name,
+          content: templateDetails?.content,  
+        };
+      }));
+      console.log(templatesWithContent,'templatesWithContent')
+
+      return {
+        ...item,
+        product: {
+          id: product.id,
+          templates: templatesWithContent, 
+        },
+      };
+    }));
+    console.log(itemsWithProductDetails,'itemsWithProductDetails')
+    return {
+      orderId,
+      buyerId: orderDetails.buyer.id,
+      packId: orderDetails.pack_id,
+      items: itemsWithProductDetails,
+    };
   } catch (error) {
     console.error('Error al procesar la notificación:', error.message);
     throw error;
@@ -41,7 +70,6 @@ export const fetchOrderDetails = async (orderId) => {
     throw new Error('No se encontró el token de acceso. Asegúrate de estar autenticado.');
   }
 
-  console.log('pase', accessToken)
   const url = `https://api.mercadolibre.com/orders/${orderId}`;
 
   const response = await fetch(url, {

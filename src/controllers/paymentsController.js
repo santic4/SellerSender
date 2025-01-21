@@ -5,6 +5,8 @@
  * @param {object} res 
 */
 
+import { sendMessage } from "../services/messagesServices.js";
+import { saveOrderServices } from "../services/paymentsServices.js";
 import { processWebhookNotification } from "../services/webhookService.js";
 
 export const webhookPayment = async (req, res) => {
@@ -14,11 +16,17 @@ export const webhookPayment = async (req, res) => {
         if (!topic || !resource) {
           return res.status(400).json({ error: 'Solicitud inválida, faltan datos requeridos.' });
         }
-    
-        // Procesa la notificación y obtiene el resultado
+
+        console.log('1 controller payments')
         const result = await processWebhookNotification(topic, resource);
     
-        // Respuesta con éxito y detalle del procesamiento
+        console.log(result,'2 controller payments')
+
+        await sendMessage(result);
+        console.log('3 controller payments')
+
+        //await saveOrderServices(result);
+        // console.log('4 controller payments')
         res.status(200).json({ message: 'Notificación procesada correctamente', data: result });
       } catch (error) {
         console.error('Error al procesar el webhook:', error.message);

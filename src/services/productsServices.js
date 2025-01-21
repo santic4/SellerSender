@@ -4,6 +4,8 @@
  * @returns {Promise<object[]>} Información del usuario.
  */
 
+import { Product } from "../models/Product.js";
+
 class ProductServices{
     async getProductsServices(accessToken, userID){
 
@@ -69,6 +71,8 @@ class ProductServices{
           throw error;
         }
       };
+
+
 }
 
 export const productServices = new ProductServices()
