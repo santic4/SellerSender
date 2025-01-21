@@ -13,6 +13,7 @@ export const webhookPayment = async (req, res) => {
     try {
         const { topic, resource } = req.body;
     
+        console.log(topic,'topic', resource, 'resource')
         if (!topic || !resource) {
           return res.status(400).json({ error: 'Solicitud inválida, faltan datos requeridos.' });
         }
@@ -27,6 +28,7 @@ export const webhookPayment = async (req, res) => {
 
         //await saveOrderServices(result);
         // console.log('4 controller payments')
+
         res.status(200).json({ message: 'Notificación procesada correctamente', data: result });
       } catch (error) {
         console.error('Error al procesar el webhook:', error.message);

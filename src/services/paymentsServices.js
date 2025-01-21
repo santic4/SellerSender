@@ -7,8 +7,6 @@ export const saveOrderServices = async (result) => {
             buyerId: result.buyerId,
             packId: result.packId,
             items: result.items,
-            status: 'pending',  
-            paymentStatus: 'pending',  
             totalAmount: result.items.reduce((total, item) => total + item.totalAmount, 0), 
         });
         
