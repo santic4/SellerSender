@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
-import { getAccessToken } from './authService.js';
 import { Template } from '../models/Template.js';
 import { Product } from '../models/Product.js';
+import { ACCESS_TOKEN } from '../config/config.js';
 
 /**
  * Procesa una notificación del webhook de Mercado Libre.
@@ -64,8 +64,9 @@ export const processWebhookNotification = async (topic, resource) => {
 export const fetchOrderDetails = async (orderId) => {
 
 
-  const accessToken = getAccessToken();
+  const accessToken = ACCESS_TOKEN;
 
+  console.log(accessToken,'accessToken')
   if (!accessToken) {
     throw new Error('No se encontró el token de acceso. Asegúrate de estar autenticado.');
   }
