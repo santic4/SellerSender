@@ -1,5 +1,4 @@
-import { CLIENT_ID } from "../config/config.js";
-import { getAccessToken } from "./authService.js";
+import { ACCESS_TOKEN, CLIENT_ID } from "../config/config.js";
 import { userServices } from "./usersServices.js";
 
 /**
@@ -38,7 +37,7 @@ export const fetchPendingMessages = async (token) => {
 export const sendMessage = async (result) => {
   try {
     console.log('antes del token send message')
-    const accessToken = getAccessToken();
+    const accessToken = ACCESS_TOKEN;
 
     if (!accessToken) {
       throw new Error('No se encontró el token de acceso. Asegúrate de estar autenticado.');

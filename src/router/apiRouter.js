@@ -12,5 +12,6 @@ apiRouter.use("/products", productsRouter);
 apiRouter.use("/messages", messagesRouter);
 apiRouter.use('/templates', templateRouter);
 apiRouter.use('/payments', paymentsRouter);
+apiRouter.use('/test', testRouter);
 
 export default apiRouter;
