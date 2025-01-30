@@ -34,14 +34,14 @@ export const fetchPendingMessages = async (token) => {
   };
 
   
-export const sendMessage = async (result) => {
+export const sendMessage = async (result, accessToken) => {
   try {
     console.log('antes del token send message')
-    const accessToken = ACCESS_TOKEN;
 
     if (!accessToken) {
       throw new Error('No se encontró el token de acceso. Asegúrate de estar autenticado.');
     }
+    
     console.log('despues del token send message')
     const sellerId = await userServices.getInfoUserServices(accessToken);
     console.log(sellerId,'sellerId')

@@ -9,9 +9,9 @@ const OrderItemSchema = new mongoose.Schema({
 });
 
 const OrderSchema = new mongoose.Schema({
-  orderId: { type: String, required: true },
-  buyerId: { type: String, required: true },
-  packId: { type: String, required: true },
+  orderId: { type: String},
+  buyerId: { type: String },
+  packId: { type: String },
   items: [OrderItemSchema],
   totalAmount: { type: Number },
   createdAt: { type: Date, default: Date.now },

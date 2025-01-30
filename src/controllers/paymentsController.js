@@ -43,7 +43,7 @@ export const webhookPayment = async (req, res) => {
     
         console.log(result,'2 controller payments')
 
-        await sendMessage(result);
+        await sendMessage(result, accessToken);
         console.log('3 controller payments, mensaje enviado')
 
         await saveOrderServices(result);
