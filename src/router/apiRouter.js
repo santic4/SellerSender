@@ -4,6 +4,7 @@ import messagesRouter from './messagesRouter.js'
 import templateRouter from './templateRouter.js'
 import paymentsRouter from './paymentsRouter.js'
 import productsRouter from "./productsRouter.js";
+import testRouter from "./testRouter.js";
 
 const apiRouter = express.Router();
 
