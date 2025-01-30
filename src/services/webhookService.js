@@ -10,13 +10,13 @@ import { ACCESS_TOKEN } from '../config/config.js';
  * @returns {object} - Datos procesados del recurso.
  */
 
-export const processWebhookNotification = async (topic, resource) => {
+export const processWebhookNotification = async (topic, resource, accessToken) => {
   try {
 
     const orderId = resource.split('/').pop();
 
     console.log('1 webhook services')
-    const orderDetails = await fetchOrderDetails(orderId);
+    const orderDetails = await fetchOrderDetails(orderId, accessToken);
 
     console.log(orderDetails,'2 webhook services')
 
@@ -61,12 +61,10 @@ export const processWebhookNotification = async (topic, resource) => {
  * @param {string} orderId - ID de la orden.
  * @returns {object} - Detalles de la orden.
  */
-export const fetchOrderDetails = async (orderId) => {
-
-
-  const accessToken = ACCESS_TOKEN;
+export const fetchOrderDetails = async (orderId, accessToken) => {
 
   console.log(accessToken,'accessToken')
+
   if (!accessToken) {
     throw new Error('No se encontró el token de acceso. Asegúrate de estar autenticado.');
   }
