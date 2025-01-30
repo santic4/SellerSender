@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import { Template } from '../models/Template.js';
 import { Product } from '../models/Product.js';
-import { ACCESS_TOKEN } from '../config/config.js';
 
 /**
  * Procesa una notificación del webhook de Mercado Libre.
@@ -23,11 +22,11 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
 
       const product = await Product.findOne({ id: item.item.id });
-
+      console.log(product,'product services')
       const templatesWithContent = await Promise.all(product.templates.map(async (template) => {
 
         const templateDetails = await Template.findById(template.templateId);
-
+        console.log(templateDetails,'product services templateDetails')
         return {
           name: template.name,
           content: templateDetails?.content,  
@@ -84,5 +83,7 @@ export const fetchOrderDetails = async (orderId, accessToken) => {
     throw new Error(`Error al consultar la orden ${orderId}`);
   }
 
-  return await response.json();
+  const orderCaptured = await response.json();
+  console.log(orderCaptured,'orderCaptured')
+  return orderCaptured;
 };
