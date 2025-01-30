@@ -1,8 +1,8 @@
 import express from "express";
-import { testController } from "../controllers/testController.js";
+import { testController, createExpiredToken } from "../controllers/testController.js";
 
 const testRouter = express.Router();
 
 testRouter.get("/", testController);
-
+testRouter.post("/", createExpiredToken);
 export default testRouter;
