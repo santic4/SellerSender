@@ -45,14 +45,9 @@ export const sendMessage = async (result, accessToken) => {
     console.log('despues del token send message')
     const sellerId = await userServices.getInfoUserServices(accessToken);
     console.log(sellerId,'sellerId')
-    let PACK_ID = ''
   
-    if(result.pack_id){
-      PACK_ID = result.packId;
-    }else{
-      PACK_ID = result.orderId;
-    }
-  
+    const PACK_ID = result.pack_id ? result.pack_id : result.orderId;
+
     for (const item of result.items) {
       const product = item.product;
   
@@ -71,7 +66,7 @@ export const sendMessage = async (result, accessToken) => {
   
         console.log(product,'antes de mandar mensaje en message services ')
         // Realizar el POST a la API de Mercado Libre
-        const response = await fetch(`https://api.mercadolibre.com/messages/packs/${result.packId}/sellers/${sellerId}?tag=post_sale`, {
+        const response = await fetch(`https://api.mercadolibre.com/messages/packs/${PACK_ID}/sellers/${sellerId}?tag=post_sale`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -89,7 +84,7 @@ export const sendMessage = async (result, accessToken) => {
           console.error(`Error al enviar mensaje: ${data.message}`);
         }
   
-      return await response.json();
+      return data;
       }
     }
   } catch (error) {
