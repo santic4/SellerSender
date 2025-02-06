@@ -78,6 +78,8 @@ export const sendMessage = async (result, accessToken) => {
         });
   
         const data = await response.json();
+        console.log(data,'dataaaaaa')
+        
         if (response.ok) {
           console.log(`Mensaje enviado correctamente a ${result.buyerId}`);
         } else {
