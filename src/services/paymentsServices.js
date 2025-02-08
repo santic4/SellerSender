@@ -7,7 +7,6 @@ export const saveOrderServices = async (result) => {
             buyerId: result.buyerId,
             packId: result.packId,
             items: result.items,
-            totalAmount: result.items.reduce((total, item) => total + item.totalAmount, 0), 
         });
         
         await order.save();
@@ -18,3 +17,27 @@ export const saveOrderServices = async (result) => {
       throw error;
     }
 }
+
+export const checkExistingOrder = async (result) => {
+    try {
+        
+        const orderId = result.orderId;
+
+        if (!orderId) {
+            throw new Error('No se encontró un ID de orden válido.');
+        }
+
+        const existingOrder = await Order.findOne({ orderId });
+
+        if (existingOrder) {
+            console.log(`Orden ${orderId} ya existe en la base de datos.`);
+            return true; 
+        }
+
+        return false; 
+    } catch (error) {
+        console.error('Error al verificar la orden:', error.message);
+        throw error; 
+    }
+};
+

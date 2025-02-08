@@ -13,7 +13,6 @@ const OrderSchema = new mongoose.Schema({
   buyerId: { type: String },
   packId: { type: String },
   items: [OrderItemSchema],
-  totalAmount: { type: Number },
   createdAt: { type: Date, default: Date.now },
 });
 

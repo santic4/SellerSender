@@ -6,7 +6,7 @@
 */
 
 import { sendMessage } from "../services/messagesServices.js";
-import { saveOrderServices } from "../services/paymentsServices.js";
+import { checkExistingOrder, saveOrderServices } from "../services/paymentsServices.js";
 import { tokenServices } from "../services/testServices.js";
 import { processWebhookNotification } from "../services/webhookService.js";
 
@@ -40,6 +40,12 @@ export const webhookPayment = async (req, res) => {
 
         console.log('1 controller payments', accessToken)
         const result = await processWebhookNotification(topic, resource, accessToken);
+
+        const orderExists = await checkExistingOrder(result);
+        
+        if (orderExists) {
+            return res.status(200).json({ message: 'Orden ya procesada, ignorando webhook.' });
+        }
     
         console.log(result,'2 controller payments')
 
