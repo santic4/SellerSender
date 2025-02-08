@@ -51,25 +51,18 @@ export const fetchPendingMessages = async (token) => {
       for (const item of result.items) {
         const product = item.product;
   
-        // Array para almacenar todas las promesas de los mensajes
-        const messagePromises = [];
-  
         for (const template of product.templates) {
           const message = {
-            from: {
-              user_id: sellerId,
-            },
-            to: {
-              user_id: result.buyerId,
-            },
+            from: { user_id: sellerId },
+            to: { user_id: result.buyerId },
             text: template.content,
             attachments: [],
           };
   
-          console.log(product, 'antes de mandar mensaje en message services');
+          console.log(`Enviando mensaje: "${template.content}"`);
   
-          // Crear promesa para el fetch
-          const messagePromise = fetch(
+          // Enviar el mensaje de forma secuencial
+          const response = await fetch(
             `https://api.mercadolibre.com/messages/packs/${PACK_ID}/sellers/${sellerId}?tag=post_sale`,
             {
               method: 'POST',
@@ -81,32 +74,21 @@ export const fetchPendingMessages = async (token) => {
               },
               body: JSON.stringify(message),
             }
-          )
-            .then(async (response) => {
-              const data = await response.json();
-              if (response.ok) {
-                console.log(`Mensaje enviado correctamente a ${result.buyerId}:`, template.content);
-              } else {
-                console.error(`Error al enviar mensaje: ${data.message}`);
-              }
-              return data;
-            })
-            .catch((error) => {
-              console.error('Error en la solicitud de mensaje:', error.message);
-              throw error;
-            });
+          );
   
-          // Agregar la promesa al array
-          messagePromises.push(messagePromise);
+          const data = await response.json();
+          if (response.ok) {
+            console.log(`Mensaje enviado correctamente a ${result.buyerId}: "${template.content}"`);
+          } else {
+            console.error(`Error al enviar mensaje: ${data.message}`);
+          }
         }
-  
-        // Esperar a que todas las solicitudes de mensajes se completen antes de continuar
-        await Promise.all(messagePromises);
       }
-      
-      console.log('Todos los mensajes fueron enviados correctamente.');
+  
+      console.log('Todos los mensajes fueron enviados correctamente en el orden esperado.');
     } catch (error) {
       console.error('Error al procesar la notificación:', error.message);
       throw error;
     }
   };
+  
