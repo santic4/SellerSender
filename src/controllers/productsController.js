@@ -113,6 +113,7 @@ export const addTemplateToProduct = async (req, res, next) => {
     }
 
     const product = await Product.findOne({ id: productId });
+    console.log(product,'product en add template to product')
     if (!product) {
       return res.status(404).json({ message: "Producto no encontrado." });
     }
