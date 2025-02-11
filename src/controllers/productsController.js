@@ -105,6 +105,7 @@ export const deleteTemplate = async (req, res, next) => {
 export const addTemplateToProduct = async (req, res, next) => {
   const { productId } = req.params;
   const { templateId } = req.body;
+  const { productAsign } = req.body;
 
   try {
     const template = await Template.findById(templateId);
@@ -123,7 +124,7 @@ export const addTemplateToProduct = async (req, res, next) => {
       return res.status(400).json({ message: "La plantilla ya está asignada al producto." });
     }
 
-    product.templates.push({ templateId: template._id, name: template.name });
+    product.templates.push({ templateId: template._id, name: template.name, assignedPublications: [productAsign] });
     await product.save();
 
     res.status(200).json({ message: "Plantilla añadida correctamente." });
