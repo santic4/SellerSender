@@ -112,7 +112,7 @@ export const addTemplateToProduct = async (req, res, next) => {
     if (!template) {
       return res.status(404).json({ message: "Plantilla no encontrada." });
     }
-
+    console.log(productAsign,'productAsign')
     const product = await Product.findOne({ id: productId });
     console.log(product,'product en add template to product')
     if (!product) {
