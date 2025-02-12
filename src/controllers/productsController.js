@@ -37,6 +37,13 @@ export const asignTemplate = async (req, res, next) => {
       return res.status(400).json({ message: "Algunas plantillas no son válidas." });
     }
 
+    const templateUpdateMany = await Template.updateMany(
+      { _id: { $in: templateIds } },
+      { $addToSet: { assignedPublications: productAsign } }
+    );
+
+    console.log(templateUpdateMany,'templateUpdateMany')
+
     const templateObjects = templates.map(template => ({
       templateId: template._id,
       name: template.name,
