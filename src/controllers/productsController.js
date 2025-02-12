@@ -24,15 +24,15 @@ export const getProductsController = async (req, res, next) => {
 }
 
 export const asignTemplate = async (req, res, next) => {
-
   const { id } = req.params;
   const { templateIds } = req.body;
+  const { productAsign } = req.body;
 
   try {
 
-    console.log(templateIds,'template,ids')
     const templates = await Template.find({ '_id': { $in: templateIds } });
-    console.log(templates,'template,ids despues')
+  
+    console.log(templates,'templates en coso')
     if (templates.length !== templateIds.length) {
       return res.status(400).json({ message: "Algunas plantillas no son válidas." });
     }
@@ -44,24 +44,20 @@ export const asignTemplate = async (req, res, next) => {
 
     let product = await Product.findOne({ id: id });
 
-
     if (!product) {
-      console.log('el producto no existe')
+
       product = new Product({
         id: id,
         templates: templateObjects,
+        title: productAsign
       });
-      console.log(product, 'el producto creado')
     } else {
-      console.log(product, 'el producto existe')
-      // Si el producto existe, combinar las plantillas existentes con las nuevas
       const existingTemplates = product.templates.map(t => t.templateId.toString());
       const newTemplates = templateObjects.filter(t => !existingTemplates.includes(t.templateId.toString()));
 
       product.templates = [...product.templates, ...newTemplates];
     }
 
-    console.log(product, 'antes del save')
     await product.save();
 
     res.status(200).json(product);
@@ -105,26 +101,27 @@ export const deleteTemplate = async (req, res, next) => {
 export const addTemplateToProduct = async (req, res, next) => {
   const { productId } = req.params;
   const { templateId } = req.body;
-  const { productAsign } = req.body;
+
 
   try {
     const template = await Template.findById(templateId);
     if (!template) {
       return res.status(404).json({ message: "Plantilla no encontrada." });
     }
-    console.log(productAsign,'productAsign')
+
     const product = await Product.findOne({ id: productId });
-    console.log(product,'product en add template to product')
+
     if (!product) {
       return res.status(404).json({ message: "Producto no encontrado." });
     }
 
     const existingTemplate = product.templates.find((t) => t.templateId.toString() === templateId);
+    
     if (existingTemplate) {
       return res.status(400).json({ message: "La plantilla ya está asignada al producto." });
     }
 
-    product.templates.push({ templateId: template._id, name: template.name, assignedPublications: [productAsign] });
+    product.templates.push({ templateId: template._id, name: template.name });
     await product.save();
 
     res.status(200).json({ message: "Plantilla añadida correctamente." });
