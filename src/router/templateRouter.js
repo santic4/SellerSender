@@ -5,6 +5,6 @@ const templateRouter = express.Router();
 
 templateRouter.get("/", getTemplates);
 templateRouter.post("/", createTemplate);
-templateRouter.put("/templates/:id", updateTemplate);
+templateRouter.put("/:id", updateTemplate);
 
 export default templateRouter;

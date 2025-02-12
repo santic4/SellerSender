@@ -23,21 +23,29 @@ export const getTemplates = async (req, res) => {
   }
 };
 
-export const updateTemplate = async (req, res) => {
-  const { id } = req.params;
-  const { name, content, assignedPublications } = req.body;
+export const updateTemplate = async (req, res, next) => {
+  const { id } = req.params; // id de la plantilla a actualizar
+  const { name, content, assignedPublications } = req.body; // datos a actualizar
+
   try {
-    const updatedTemplate = await Template.findByIdAndUpdate(
-      id,
-      { name, content, assignedPublications },
-      { new: true, runValidators: true }
-    );
-    if (!updatedTemplate) {
-      return res.status(404).send('Plantilla no encontrada');
+    console.log('entre')
+    // Buscar la plantilla por su id
+    const template = await Template.findById(id);
+    if (!template) {
+      return res.status(404).json({ message: "Plantilla no encontrada" });
     }
-    res.json(updatedTemplate);
+
+    // Actualizar los campos
+    template.name = name;
+    template.content = content;
+    // Se espera que assignedPublications sea un arreglo, en caso contrario se asigna un arreglo vacío
+    template.assignedPublications = Array.isArray(assignedPublications) ? assignedPublications : [];
+
+    // Guardar la plantilla actualizada
+    const updatedTemplate = await template.save();
+
+    res.status(200).json(updatedTemplate);
   } catch (error) {
-    console.error('Error al actualizar plantilla:', error);
-    res.status(500).send('Error al actualizar plantilla');
+    next(error);
   }
-}
+};

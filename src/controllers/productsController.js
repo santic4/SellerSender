@@ -30,6 +30,7 @@ export const asignTemplate = async (req, res, next) => {
 
   try {
 
+    console.log('entro1')
     const templates = await Template.find({ '_id': { $in: templateIds } });
   
     console.log(templates,'templates en coso')
@@ -107,31 +108,109 @@ export const deleteTemplate = async (req, res, next) => {
 
 export const addTemplateToProduct = async (req, res, next) => {
   const { productId } = req.params;
-  const { templateId } = req.body;
-
+  const { templateIds } = req.body; // Ahora recibimos un array de IDs
 
   try {
-    const template = await Template.findById(templateId);
-    if (!template) {
-      return res.status(404).json({ message: "Plantilla no encontrada." });
+    // Validamos que se envíe un array
+    if (!Array.isArray(templateIds)) {
+      return res.status(400).json({ message: "El campo templateIds debe ser un arreglo." });
     }
 
     const product = await Product.findOne({ id: productId });
-
     if (!product) {
       return res.status(404).json({ message: "Producto no encontrado." });
     }
 
-    const existingTemplate = product.templates.find((t) => t.templateId.toString() === templateId);
-    
-    if (existingTemplate) {
-      return res.status(400).json({ message: "La plantilla ya está asignada al producto." });
+    const addedTemplates = [];
+    const skippedTemplates = [];
+
+    // Iteramos sobre cada templateId recibido
+    for (const tid of templateIds) {
+      const template = await Template.findById(tid);
+      if (!template) {
+        skippedTemplates.push({ templateId: tid, reason: "Plantilla no encontrada." });
+        continue;
+      }
+
+      // Verificamos si la plantilla ya está asignada
+      const existingTemplate = product.templates.find(
+        (t) => t.templateId.toString() === tid.toString()
+      );
+      if (existingTemplate) {
+        skippedTemplates.push({ templateId: tid, reason: "La plantilla ya está asignada." });
+        continue;
+      }
+
+      // Agregamos la plantilla al producto
+      product.templates.push({ templateId: template._id, name: template.name });
+      addedTemplates.push({ templateId: template._id, name: template.name });
     }
 
-    product.templates.push({ templateId: template._id, name: template.name });
     await product.save();
 
-    res.status(200).json({ message: "Plantilla añadida correctamente." });
+    res.status(200).json({
+      message: "Plantilla(s) añadida(s) correctamente.",
+      addedTemplates,
+      skippedTemplates,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const reorderTemplateInProduct = async (req, res, next) => {
+  const { productId } = req.params;
+  const { templateId, direction } = req.body; 
+
+  try {
+    // Buscamos el producto según su id (ajusta según tu modelo)
+    const product = await Product.findOne({ id: productId });
+    console.log(product,'producto encontrado')
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado." });
+    }
+
+
+    const id_template = templateId._id;
+
+    console.log(id_template,'id_template')
+    console.log(product.templates,'product.templates')
+
+    // Encontrar el índice de la plantilla en el array
+    const index = product.templates.findIndex(
+      (t) => t.templateId.toString() === id_template.toString()
+    );
+
+    if (index === -1) {
+      return res.status(404).json({ message: "Plantilla no asignada." });
+    }
+
+    // Determinar el nuevo índice basado en la dirección
+    let newIndex;
+    if (direction === "up") {
+      newIndex = index - 1;
+    } else if (direction === "down") {
+      newIndex = index + 1;
+    } else {
+      return res.status(400).json({ message: "Dirección no válida." });
+    }
+
+    // Verificar límites del array
+    if (newIndex < 0 || newIndex >= product.templates.length) {
+      return res.status(400).json({ message: "No se puede mover en esa dirección." });
+    }
+
+    // Intercambiar la plantilla actual con la plantilla en la nueva posición
+    const temp = product.templates[index];
+    product.templates[index] = product.templates[newIndex];
+    product.templates[newIndex] = temp;
+
+    await product.save();
+
+    res.status(200).json({
+      message: "Orden actualizado correctamente.",
+      templates: product.templates,
+    });
   } catch (error) {
     next(error);
   }
