@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN, CLIENT_ID } from "../config/config.js";
+import { CLIENT_ID } from "../config/config.js";
 import { userServices } from "./usersServices.js";
 
 /**
