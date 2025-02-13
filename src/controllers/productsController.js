@@ -106,6 +106,22 @@ export const deleteTemplate = async (req, res, next) => {
   }
 };
 
+export const deleteProductAsign = async (req, res, next) => {
+  const { productId } = req.params;
+
+  try {
+    const product = await Product.findOneAndDelete({ id: productId });
+
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado." });
+    }
+
+    res.status(200).json({ message: "Producto eliminado correctamente." });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const addTemplateToProduct = async (req, res, next) => {
   const { productId } = req.params;
   const { templateIds } = req.body; // Ahora recibimos un array de IDs
