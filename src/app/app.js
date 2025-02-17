@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import { connectDB } from '../config/db.js';
 import cookieParser from 'cookie-parser';
 import apiRouter from '../router/apiRouter.js';
+import { CLIENT_ID, CLIENT_SECRET } from '../config/config.js';
 
 dotenv.config();
 
@@ -66,3 +67,4 @@ app.get('*', (req, res) => {
 
 const PORT = 8080;
 app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
+console.log(CLIENT_ID,'client', CLIENT_SECRET,'secrete')
