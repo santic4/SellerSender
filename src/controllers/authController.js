@@ -10,7 +10,7 @@ export const getAuthUrl = (req, res) => {
 
 export const callback = async (req, res) => {
   const { code } = req.query;
-
+  console.log("Código de autorización recibido:", code);
   try {
     // Intercambio del código de autorización por tokens
     const response = await fetch('https://api.mercadolibre.com/oauth/token', {
@@ -55,24 +55,6 @@ export const callback = async (req, res) => {
   }
 };
 
-export const checkAuth = async (req, res) => {
-  const token = req.cookies.accessToken;
-
-  if (!token) {
-    return res.status(401).json({ isAuthenticated: false });
-  }
-
-  try {
-    // Verificar el token (puedes usar una librería JWT si es necesario)
-    // Asegúrate de manejar errores y tokens expirados de forma segura
-    console.log(token,'token en check')
-
-    res.status(200).json({ isAuthenticated: true });
-  } catch (error) {
-    console.error("Error al validar el token:", error.message);
-    res.status(401).json({ isAuthenticated: false });
-  }
-};
 
 export const refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken; // Obtener el token desde las cookies
