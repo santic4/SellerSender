@@ -3,7 +3,7 @@ import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../config/config.js";
 
 export const getAuthUrl = (req, res) => {
 
-  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
+  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=read_orders,write_orders`;
 
   res.json({ authUrl });
 };
