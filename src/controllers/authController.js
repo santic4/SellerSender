@@ -3,7 +3,7 @@ import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../config/config.js";
 
 export const getAuthUrl = (req, res) => {
 
-  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
+  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=read_orders,write_orders`;
 
   res.json({ authUrl });
 };
@@ -55,6 +55,7 @@ export const callback = async (req, res) => {
   }
 };
 
+
 export const refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken; // Obtener el token desde las cookies
 
@@ -100,7 +101,6 @@ export const refreshAccessToken = async (req, res) => {
   }
 };
 
-
 export const checkAuth = async (req, res) => {
   console.log('entre al check auth', req.cookies)
   const accessToken = req.cookies.accessToken;
@@ -120,7 +120,6 @@ export const checkAuth = async (req, res) => {
   }
 };
 
-
 export const getAccessToken = (req, res) => {
   const accessToken = req.cookies.accessToken; // Obtener el token desde las cookies
   if (!accessToken) {
@@ -128,4 +127,3 @@ export const getAccessToken = (req, res) => {
   }
   res.json({ accessToken });
 };
-
