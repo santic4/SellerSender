@@ -55,7 +55,6 @@ export const callback = async (req, res) => {
   }
 };
 
-
 export const refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken; // Obtener el token desde las cookies
 
@@ -101,6 +100,27 @@ export const refreshAccessToken = async (req, res) => {
   }
 };
 
+
+export const checkAuth = async (req, res) => {
+  console.log('entre al check auth', req.cookies)
+  const accessToken = req.cookies.accessToken;
+  if (!accessToken) return res.status(401).json({ isAuthenticated: false });
+
+  try {
+    const response = await fetch("https://api.mercadolibre.com/users/me", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    if (!response.ok) return res.status(401).json({ isAuthenticated: false });
+
+    const userData = await response.json();
+    res.json({ isAuthenticated: true, user: userData });
+  } catch (error) {
+    res.status(500).json({ isAuthenticated: false });
+  }
+};
+
+
 export const getAccessToken = (req, res) => {
   const accessToken = req.cookies.accessToken; // Obtener el token desde las cookies
   if (!accessToken) {
@@ -108,3 +128,4 @@ export const getAccessToken = (req, res) => {
   }
   res.json({ accessToken });
 };
+
