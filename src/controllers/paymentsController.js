@@ -29,6 +29,8 @@ const getValidAccessToken = async () => {
     return await tokenServices.refreshAccessToken();
   }
 
+  console.log('paso sin pena ni gloria', token)
+
   return token.accessToken;
 };
 
