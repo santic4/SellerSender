@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../config/config.js";
+import { tokenServices } from "../services/testServices.js";
 
 export const getAuthUrl = (req, res) => {
 
@@ -32,7 +33,11 @@ export const callback = async (req, res) => {
 
     const data = await response.json();
     console.log(data,'data en callback')
-    const { access_token, refresh_token } = data;
+    const { access_token, refresh_token, expires_in } = data;
+
+    const tokenUpdated = await tokenServices.updateTokenInDB(access_token, refresh_token, expires_in);
+
+    console.log(tokenUpdated, 'tokenUpdated')
 
     // Guardar los tokens en cookies HttpOnly
     res.cookie('accessToken', access_token, {
@@ -83,6 +88,11 @@ export const refreshAccessToken = async (req, res) => {
 
     const data = await response.json();
     const { access_token, refresh_token, expires_in } = data;
+
+
+    const tokenUpdated = await tokenServices.updateTokenInDB(access_token, refresh_token, expires_in);
+
+    console.log(tokenUpdated, 'tokenUpdated refresh')
 
     // Actualizar cookies con los nuevos tokens
     const cookieOptions = {

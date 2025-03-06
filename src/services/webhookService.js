@@ -15,6 +15,11 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
     console.log('processWebhookNotifications')
     const orderId = resource.split('/').pop();
 
+    if(!orderId){
+      throw new Error('No existe el orderId.')
+    }
+    console.log(orderId,'orderId')
+
     const orderDetails = await fetchOrderDetails(orderId, accessToken);
 
     console.log(orderDetails,'1 webhook services')
