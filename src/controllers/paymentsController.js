@@ -13,25 +13,10 @@ import { processWebhookNotification } from "../services/webhookService.js";
 const getValidAccessToken = async () => {
   const token = await tokenServices.getTokenFromDB();
 
-  if (!token) {
-    console.log("No hay token en la base de datos, generando uno nuevo...");
+    console.log("token",token);
+    
     return await tokenServices.refreshAccessToken();
-  }
 
-  const now = Date.now();
-  const lastUpdated = new Date(token.lastUpdated).getTime();
-  const tokenAge = now - lastUpdated; // Convertimos a milisegundos
-
-  const expiresInMs = Number(token.expiresIn) * 1000; // Convertimos a milisegundos
-
-  if (isNaN(expiresInMs) || tokenAge >= expiresInMs) {
-    console.log("El token expiró, renovando...");
-    return await tokenServices.refreshAccessToken();
-  }
-
-  console.log('paso sin pena ni gloria', token)
-
-  return token.accessToken;
 };
 
 export const webhookPayment = async (req, res) => {
