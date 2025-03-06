@@ -12,12 +12,12 @@ import { Product } from '../models/Product.js';
 export const processWebhookNotification = async (topic, resource, accessToken) => {
   try {
 
+    console.log('processWebhookNotifications')
     const orderId = resource.split('/').pop();
 
-    console.log('1 webhook services')
     const orderDetails = await fetchOrderDetails(orderId, accessToken);
 
-    console.log(orderDetails,'2 webhook services')
+    console.log(orderDetails,'1 webhook services')
 
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
 

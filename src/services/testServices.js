@@ -6,7 +6,7 @@ class TokenServices{
 
     async getTokenFromDB () {
       try {
-        const token = await Token.findOne(); 
+        const token = await Token.findOne().lean(); 
         if (!token) {
           throw new Error("No se encontró ningún token en la base de datos");
         }
