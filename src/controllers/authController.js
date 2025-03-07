@@ -137,3 +137,15 @@ export const getAccessToken = (req, res) => {
   }
   res.json({ accessToken });
 };
+
+export const logoutMeli = async (req, res) => {
+  try {
+    res.clearCookie('accessToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'Strict' });
+
+    res.status(200).json({ message: 'Sesión cerrada exitosamente' });
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error);
+    res.status(500).json({ error: 'Error al cerrar sesión' });
+  }
+};
