@@ -4,7 +4,7 @@ import { tokenServices } from "../services/testServices.js";
 
 export const getAuthUrl = (req, res) => {
 
-  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=read_orders,write_orders`;
+  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
 
   res.json({ authUrl });
 };
