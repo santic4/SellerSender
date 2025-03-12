@@ -10,7 +10,7 @@ import { checkExistingOrder, saveOrderServices } from "../services/paymentsServi
 import { tokenServices } from "../services/testServices.js";
 import { processWebhookNotification } from "../services/webhookService.js";
 
-const getValidAccessToken = async () => {
+export const getValidAccessToken = async () => {
   const token = await tokenServices.getTokenFromDB();
 
   if (!token) {

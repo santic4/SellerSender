@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } from "../config/config.js";
+import { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, CLIENT_ID_PERMITIDO } from "../config/config.js";
 import { tokenServices } from "../services/testServices.js";
 
 export const getAuthUrl = (req, res) => {
@@ -112,8 +112,8 @@ export const refreshAccessToken = async (req, res) => {
 };
 
 export const checkAuth = async (req, res) => {
-  console.log('entre al check auth', req.cookies)
   const accessToken = req.cookies.accessToken;
+
   if (!accessToken) return res.status(401).json({ isAuthenticated: false });
 
   try {
@@ -124,6 +124,19 @@ export const checkAuth = async (req, res) => {
     if (!response.ok) return res.status(401).json({ isAuthenticated: false });
 
     const userData = await response.json();
+
+    // Verifica que la respuesta tenga un ID válido
+    if (!userData || typeof userData !== "object" || !userData.id) {
+      console.log('id invalido')
+      return res.status(400).json({ isAuthenticated: false, message: "Respuesta inválida de MercadoLibre" });
+    }
+
+    console.log("ID del usuario autenticado:", userData.id);
+
+    if (userData.id.toString() !== CLIENT_ID_PERMITIDO) {
+      return res.status(403).json({ isAuthenticated: false, message: "Acceso denegado" });
+    }
+
     res.json({ isAuthenticated: true, user: userData });
   } catch (error) {
     res.status(500).json({ isAuthenticated: false });

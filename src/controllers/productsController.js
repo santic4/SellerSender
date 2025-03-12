@@ -2,13 +2,16 @@ import { Template } from "../models/Template.js";
 import { Product } from "../models/Product.js";
 import { productServices } from "../services/productsServices.js";
 import { userServices } from "../services/usersServices.js";
+import { getValidAccessToken } from "./paymentsController.js";
 
 export const getProductsController = async (req, res, next) => {
-  const { accessToken } = req.cookies; 
+
+  const accessToken = await getValidAccessToken();
 
   if (!accessToken) {
     return res.status(401).json({ error: "No estás autenticado" });
   }
+
 
   try {
     const userID = await userServices.getInfoUserServices(accessToken);
@@ -30,7 +33,6 @@ export const asignTemplate = async (req, res, next) => {
 
   try {
 
-    console.log('entro1')
     const templates = await Template.find({ '_id': { $in: templateIds } });
   
     console.log(templates,'templates en coso')

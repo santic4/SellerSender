@@ -23,9 +23,9 @@ class ProductServices{
               throw new Error('Error en la respuesta de Mercado Libre al obtener productos.')
           }
       
-          console.log(responseProducts,'response products en product services')
           const data = await responseProducts.json();
       
+          console.log(data,'response products en product services')
         return data;
       } catch (error) {
         console.error("Error al obtener productos desde la API:", error.message);
