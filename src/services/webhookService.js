@@ -26,6 +26,7 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
 
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
 
+      console.log(orderDetails.order_items,'orderDetails.order_items')
       const product = await Product.findOne({ id: item.item.id });
       console.log(product,'product services')
       const templatesWithContent = await Promise.all(product.templates.map(async (template) => {

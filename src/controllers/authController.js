@@ -33,11 +33,9 @@ export const callback = async (req, res) => {
 
     const data = await response.json();
     console.log(data,'data en callback')
-    const { access_token, refresh_token, expires_in } = data;
+    const { access_token, refresh_token, expires_in, user_id } = data;
 
-    const tokenUpdated = await tokenServices.updateTokenInDB(access_token, refresh_token, expires_in);
-
-    console.log(tokenUpdated, 'tokenUpdated')
+    await tokenServices.updateTokenInDB(access_token, refresh_token, expires_in);
 
     // Guardar los tokens en cookies HttpOnly
     res.cookie('accessToken', access_token, {
@@ -47,6 +45,12 @@ export const callback = async (req, res) => {
       sameSite: 'Strict',
     });
     res.cookie('refreshToken', refresh_token, {
+      httpOnly: true,
+      secure: true,
+      maxAge: 3600000, // 1 hora
+      sameSite: 'Strict',
+    });
+    res.cookie('clientIdMeli', String(user_id), {
       httpOnly: true,
       secure: true,
       maxAge: 3600000, // 1 hora
