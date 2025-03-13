@@ -12,7 +12,6 @@ export const getProductsController = async (req, res, next) => {
     return res.status(401).json({ error: "No estás autenticado" });
   }
 
-
   try {
     const userID = await userServices.getInfoUserServices(accessToken);
 
@@ -28,61 +27,66 @@ export const getProductsController = async (req, res, next) => {
 
 export const asignTemplate = async (req, res, next) => {
   const { id } = req.params;
-  const { templateIds } = req.body;
-  const { productAsign } = req.body;
+  const { templateIds, productAsign } = req.body;
 
   try {
-
     const templates = await Template.find({ '_id': { $in: templateIds } });
-  
-    console.log(templates,'templates en coso')
+
     if (templates.length !== templateIds.length) {
       return res.status(400).json({ message: "Algunas plantillas no son válidas." });
     }
 
-    const templateUpdateMany = await Template.updateMany(
+    await Template.updateMany(
       { _id: { $in: templateIds } },
       { $addToSet: { assignedPublications: productAsign } }
     );
 
-    console.log(templateUpdateMany,'templateUpdateMany')
-
-    const templateObjects = templates.map(template => ({
-      templateId: template._id,
-      name: template.name,
-    }));
+    const templateObjects = templateIds.map(templateId => {
+      const template = templates.find(t => t._id.toString() === templateId);
+      return template ? { templateId: template._id, name: template.name } : null;
+    }).filter(t => t !== null);
 
     let product = await Product.findOne({ id: id });
 
     if (!product) {
-
       product = new Product({
         id: id,
         templates: templateObjects,
         title: productAsign
       });
     } else {
-      const existingTemplates = product.templates.map(t => t.templateId.toString());
-      const newTemplates = templateObjects.filter(t => !existingTemplates.includes(t.templateId.toString()));
-
-      product.templates = [...product.templates, ...newTemplates];
+      product.templates = templateObjects; // Reemplaza manteniendo el orden
     }
 
     await product.save();
 
     res.status(200).json(product);
-
-    res.json(product);
   } catch (error) {
-    next()
+    next();
   }
-}
+};
 
 export const getSavedProducts = async (req, res, next) => {
   try {
     const products = await Product.find().populate("templates.templateId");
 
     res.status(200).json(products);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTemplatesByProduct = async (req, res, next) => {
+  try {
+    const { productId } = req.params;
+
+    const product = await Product.findOne({ id: productId });
+
+    if (!product) {
+        return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    res.json({ templates: product.templates || [] });
   } catch (error) {
     next(error);
   }

@@ -4,29 +4,41 @@
  * @returns {Promise<object[]>} Información del usuario.
  */
 
-import { Product } from "../models/Product.js";
 
 class ProductServices{
     async getProductsServices(accessToken, userID){
-
+      const baseUrl = `https://api.mercadolibre.com/users/${userID}/items/search`;
+      let allProducts = [];
+      let offset = 0;
+      const limit = 50; // Límite máximo por página según la documentación
+    
       try {
-          const responseProducts = await fetch(`https://api.mercadolibre.com/users/${userID}/items/search`, {
+        while (true) {
+          const response = await fetch(`${baseUrl}?offset=${offset}&limit=${limit}`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
           });
-        
-          if (!responseProducts.ok) {
-              const errorText = await responseProducts.text();
-              console.log("Error en la respuesta de Mercado Libre:", errorText);
-              throw new Error('Error en la respuesta de Mercado Libre al obtener productos.')
+    
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.log("Error en la respuesta de Mercado Libre:", errorText);
+            throw new Error('Error en la respuesta de Mercado Libre al obtener productos.');
           }
-      
-          const data = await responseProducts.json();
-      
-          console.log(data,'response products en product services')
-        return data;
+    
+          const data = await response.json();
+          allProducts = allProducts.concat(data.results);
+    
+          // Verifica si hay más productos por obtener
+          if (offset + limit >= data.paging.total) {
+            break;
+          }
+    
+          offset += limit;
+        }
+    
+        return allProducts;
       } catch (error) {
         console.error("Error al obtener productos desde la API:", error.message);
         throw error;
@@ -36,7 +48,7 @@ class ProductServices{
     async getDetailsProduct(accessToken, productsData){
 
         try {
-            const productDetailsPromises = productsData.results.map(async (itemID) => {
+            const productDetailsPromises = productsData.map(async (itemID) => {
 
               const responseItem = await fetch(`https://api.mercadolibre.com/items/${itemID}`, {
                 method: "GET",
@@ -59,6 +71,7 @@ class ProductServices{
 
             const productDetails = await Promise.all(productDetailsPromises);
      
+            console.log(productDetails,'product details')
             const productsSummary = productDetails.map(product => ({
               title: product.title,
               site_id: product.site_id,
