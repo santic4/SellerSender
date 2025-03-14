@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import { connectDB } from '../config/db.js';
 import cookieParser from 'cookie-parser';
 import apiRouter from '../router/apiRouter.js';
+import "../utils/queue.js";
 
 dotenv.config();
 
@@ -16,12 +17,12 @@ app.use(cookieParser());
 app.use(express.static(path.join('public', 'build')));
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://sellersender.onrender.com',
     credentials: true 
 }));
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Origin', 'https://sellersender.onrender.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     next();
 });

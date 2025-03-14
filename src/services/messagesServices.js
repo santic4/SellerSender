@@ -33,17 +33,16 @@ export const fetchPendingMessages = async (token) => {
     }
   };
 
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   
   export const sendMessage = async (result, accessToken) => {
     try {
-      console.log('antes del token send message');
-  
       if (!accessToken) {
         throw new Error('No se encontró el token de acceso. Asegúrate de estar autenticado.');
       }
   
-      console.log('despues del token send message');
       const sellerId = await userServices.getInfoUserServices(accessToken);
+
       console.log(sellerId, 'sellerId');
   
       const PACK_ID = result.pack_id ? result.pack_id : result.orderId;
@@ -77,11 +76,14 @@ export const fetchPendingMessages = async (token) => {
           );
   
           const data = await response.json();
+
           if (response.ok) {
             console.log(`Mensaje enviado correctamente a ${result.buyerId}: "${template.content}"`);
           } else {
             console.error(`Error al enviar mensaje: ${data.message}`);
           }
+
+          await delay(5000);
         }
       }
   
