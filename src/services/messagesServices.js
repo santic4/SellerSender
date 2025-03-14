@@ -83,7 +83,7 @@ export const fetchPendingMessages = async (token) => {
             console.error(`Error al enviar mensaje: ${data.message}`);
           }
 
-          await delay(5000);
+          await delay(1000);
         }
       }
   
