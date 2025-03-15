@@ -24,21 +24,28 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
 
     console.log(orderDetails,'1 webhook services')
 
+        // Filtrar si la orden fue creada antes del 10 de marzo de 2025
+        const orderCreationDate = new Date(orderDetails.date_created);
+        const cutoffDate = new Date('2025-03-10T00:00:00Z'); // 10 de marzo de 2025 en formato UTC
+    
+      if (orderCreationDate < cutoffDate) {
+        console.log('Orden creada antes del 10 de marzo de 2025, omitiendo...');
+        return; 
+      }
+
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
 
-      console.log(orderDetails.order_items,'orderDetails.order_items')
       const product = await Product.findOne({ id: item.item.id });
-      console.log(product,'product services')
+ 
       const templatesWithContent = await Promise.all(product.templates.map(async (template) => {
 
         const templateDetails = await Template.findById(template.templateId);
-        console.log(templateDetails,'product services templateDetails')
+
         return {
           name: template.name,
           content: templateDetails?.content,  
         };
       }));
-      console.log(templatesWithContent,'templatesWithContent')
 
       return {
         ...item,
@@ -48,7 +55,7 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
         },
       };
     }));
-    console.log(itemsWithProductDetails,'itemsWithProductDetails')
+
     return {
       orderId,
       buyerId: orderDetails.buyer.id,
@@ -67,8 +74,6 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
  * @returns {object} - Detalles de la orden.
  */
 export const fetchOrderDetails = async (orderId, accessToken) => {
-
-  console.log(accessToken,'accessToken')
 
   if (!accessToken) {
     throw new Error('No se encontró el token de acceso. Asegúrate de estar autenticado.');

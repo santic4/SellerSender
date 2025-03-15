@@ -20,6 +20,7 @@ new Worker("webhookQueue", async (job) => {
 
     try {
         const accessToken = await getValidAccessToken();
+        
         const result = await processWebhookNotification(topic, resource, accessToken);
 
         const orderExists = await checkExistingOrder(result);
