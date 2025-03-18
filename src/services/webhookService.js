@@ -12,7 +12,6 @@ import { Product } from '../models/Product.js';
 export const processWebhookNotification = async (topic, resource, accessToken) => {
   try {
 
-    console.log('processWebhookNotifications')
     const orderId = resource.split('/').pop();
 
     if(!orderId){
@@ -34,6 +33,10 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
       }
 
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
+
+      console.log(orderDetails.order_items.item,'orderDetails.order_items.item')
+      console.log(orderDetails.order_items[0].item,'orderDetails.order_items[0].item')
+      console.log(orderDetails.order_items,'orderDetails.order_items')
 
       const product = await Product.findOne({ id: item.item.id });
  
