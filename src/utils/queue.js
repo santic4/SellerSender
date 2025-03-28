@@ -1,7 +1,7 @@
 import { Queue, Worker } from "bullmq";
 import { getValidAccessToken } from "../controllers/paymentsController.js";
 import { processWebhookNotification } from "../services/webhookService.js";
-import { checkExistingOrder, saveOrderServices } from "../services/paymentsServices.js";
+import { checkExistingOrder, markOrderAsDelivered, saveOrderServices } from "../services/paymentsServices.js";
 import { sendMessage } from "../services/messagesServices.js";
 
 const redisConnection = {
@@ -24,6 +24,7 @@ new Worker("webhookQueue", async (job) => {
         const result = await processWebhookNotification(topic, resource, accessToken);
 
         const orderExists = await checkExistingOrder(result);
+
         if (orderExists) {
             console.log("Orden ya procesada, ignorando webhook.");
             return;
@@ -34,6 +35,9 @@ new Worker("webhookQueue", async (job) => {
 
         await saveOrderServices(result);
 
+        const orderDelivered = await markOrderAsDelivered(result.orderId, accessToken);
+
+        console.log(orderDelivered,' order delivered ')
         console.log("Orden guardada exitosamente.");
     } catch (error) {
         console.error("Error procesando el webhook en la cola:", error.message);

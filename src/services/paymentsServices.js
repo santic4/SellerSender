@@ -18,6 +18,34 @@ export const saveOrderServices = async (result) => {
     }
 }
 
+export const markOrderAsDelivered = async (orderId, accessToken) => {
+  try {
+    const url = `https://api.mercadolibre.com/orders/${orderId}/shipments`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        status: 'delivered',
+        date_shipped: new Date().toISOString(),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Error: ${response.status} - ${errorData.message}`);
+    }
+
+    const data = await response.json();
+    console.log('Orden marcada como entregada:', data);
+  } catch (error) {
+    console.error('Error al marcar la orden como entregada:', error.message);
+  }
+};
+
 export const checkExistingOrder = async (result) => {
     try {
         
