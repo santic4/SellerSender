@@ -23,14 +23,14 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
 
     console.log(orderDetails,'1 webhook services')
 
-        // Filtrar si la orden fue creada antes del 10 de marzo de 2025
-        const orderCreationDate = new Date(orderDetails.date_created);
-        const cutoffDate = new Date('2025-03-10T00:00:00Z'); // 10 de marzo de 2025 en formato UTC
-    
-      if (orderCreationDate < cutoffDate) {
-        console.log('Orden creada antes del 10 de marzo de 2025, omitiendo...');
-        return; 
-      }
+    // Filtrar si la orden fue creada antes del 10 de marzo de 2025
+    const orderCreationDate = new Date(orderDetails.date_created);
+    const cutoffDate = new Date('2025-03-10T00:00:00Z'); // 10 de marzo de 2025 en formato UTC
+  
+    if (orderCreationDate < cutoffDate) {
+      console.log('Orden creada antes del 10 de marzo de 2025, omitiendo...');
+      return; 
+    }
 
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
 

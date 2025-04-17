@@ -3,6 +3,7 @@ import { getValidAccessToken } from "../controllers/paymentsController.js";
 import { processWebhookNotification } from "../services/webhookService.js";
 import { checkExistingOrder, saveOrderServices } from "../services/paymentsServices.js";
 import { sendMessage } from "../services/messagesServices.js";
+import { deliveredService } from "../services/deliveredServices.js";
 
 const redisConnection = {
     host: "red-cvaak6ij1k6c73e4u3g0", 
@@ -33,6 +34,14 @@ new Worker("webhookQueue", async (job) => {
         console.log("Mensaje enviado.");
 
         await saveOrderServices(result);
+
+        try {
+          await deliveredService(resource, accessToken);
+          console.log("Entrega marcada como completada.");
+        } catch (err) {
+          console.error("⚠️ No se pudo marcar la entrega como completada:", err.message);
+        }
+      
 
         console.log("Orden guardada exitosamente.");
     } catch (error) {
