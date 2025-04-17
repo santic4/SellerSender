@@ -9,29 +9,20 @@ import { Product } from '../models/Product.js';
  * @returns {object} - Datos procesados del recurso.
  */
 
-
 export const processWebhookNotification = async (topic, resource, accessToken) => {
   try {
-    // Extraer el orderId del recurso
+
     const orderId = resource.split('/').pop();
-    if (!orderId) {
-      throw new Error('No existe el orderId.');
-    }
-    console.log(orderId, 'orderId');
 
-    // Obtener detalles de la orden
+    if(!orderId){
+      throw new Error('No existe el orderId.')
+    }
+    console.log(orderId,'orderId')
+
     const orderDetails = await fetchOrderDetails(orderId, accessToken);
-    console.log(orderDetails, 'Detalles de la orden en webhook');
 
-    // Filtrar órdenes creadas antes del 10 de marzo de 2025
-    const orderCreationDate = new Date(orderDetails.date_created);
-    const cutoffDate = new Date('2025-03-10T00:00:00Z');
-    if (orderCreationDate < cutoffDate) {
-      console.log('Orden creada antes del 10 de marzo de 2025, omitiendo...');
-      return;
-    }
+    console.log(orderDetails,'1 webhook services')
 
-<<<<<<< HEAD
     // Filtrar si la orden fue creada antes del 10 de marzo de 2025
     const orderCreationDate = new Date(orderDetails.date_created);
     const cutoffDate = new Date('2025-03-10T00:00:00Z'); // 10 de marzo de 2025 en formato UTC
@@ -40,55 +31,30 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
       console.log('Orden creada antes del 10 de marzo de 2025, omitiendo...');
       return; 
     }
-=======
-    // Procesar cada item de la orden
+
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
-      // Imprimir algunos logs para depuración
-      console.log(orderDetails.order_items[0].item, 'Primer item de la orden');
-      console.log(orderDetails.order_items, 'Todos los items de la orden');
 
-      // Buscar el producto y hacer populate de las plantillas globales y de variaciones
-      const product = await Product.findOne({ id: item.item.id })
-        .populate("templates.templateId")
-        .populate("variations.templates.templateId");
+      console.log(orderDetails.order_items.item,'orderDetails.order_items.item')
+      console.log(orderDetails.order_items[0].item,'orderDetails.order_items[0].item')
+      console.log(orderDetails.order_items,'orderDetails.order_items')
 
-      if (!product) {
-        throw new Error(`Producto con ID ${item.item.id} no encontrado`);
-      }
->>>>>>> 4fe793c66c83666fc0b84a14aa7d1542f8ec9e8d
+      const product = await Product.findOne({ id: item.item.id });
+ 
+      const templatesWithContent = await Promise.all(product.templates.map(async (template) => {
 
-      let templatesWithContent = [];
+        const templateDetails = await Template.findById(template.templateId);
 
-      // Si existe una variación en el item, buscar la variante correspondiente
-      if (item.item.variation_id && Array.isArray(product.variations)) {
-        const variation = product.variations.find(v => v.id === String(item.item.variation_id));
-        console.log(variation,'variation1')
-
-        if (variation && Array.isArray(variation.templates)) {
-          templatesWithContent = variation.templates.map(template => ({
-            name: template.name,
-            content: template.templateId ? template.templateId.content : null,
-          }));
-        }
-      }
-
-      console.log(templatesWithContent,'templatesWithContent1')
-
-      // Si no se encontraron plantillas en la variación, usar las plantillas globales del producto
-      if (templatesWithContent.length === 0 && Array.isArray(product.templates)) {
-        console.log(product.templates,'product.templates')
-        templatesWithContent = product.templates.map(template => ({
+        return {
           name: template.name,
-          content: template.templateId ? template.templateId.content : null,
-        }));
-      }
+          content: templateDetails?.content,  
+        };
+      }));
 
-      console.log(templatesWithContent,'templatesWithContent2')
       return {
         ...item,
         product: {
           id: product.id,
-          templates: templatesWithContent,
+          templates: templatesWithContent, 
         },
       };
     }));
