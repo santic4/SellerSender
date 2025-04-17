@@ -27,7 +27,7 @@ export const getProductsController = async (req, res, next) => {
 
 export const asignTemplate = async (req, res, next) => {
   const { id } = req.params;
-  const { templateIds, productAsign } = req.body;
+  const { templateIds, productAsign, variationId, variationName } = req.body;
 
   try {
     const templates = await Template.find({ '_id': { $in: templateIds } });
@@ -49,13 +49,37 @@ export const asignTemplate = async (req, res, next) => {
     let product = await Product.findOne({ id: id });
 
     if (!product) {
-      product = new Product({
-        id: id,
-        templates: templateObjects,
-        title: productAsign
-      });
+      // Si el producto no existe, se crea uno nuevo.
+      if (variationId) {
+        product = new Product({
+          id: id,
+          title: productAsign,
+          templates: [],
+          variations: [{ id: variationId, name: variationName, templates: templateObjects }],
+        });
+      } else {
+        product = new Product({
+          id: id,
+          title: productAsign,
+          templates: templateObjects,
+        });
+      }
     } else {
-      product.templates = templateObjects; // Reemplaza manteniendo el orden
+      // El producto existe, se actualiza según corresponda.
+      if (variationId) {
+        // Actualizamos la variante específica.
+        let variation = product.variations.find(v => v.id === variationId);
+        if (variation) {
+          variation.templates = templateObjects;
+          variation.name = variationName;
+        } else {
+          // Si la variante no existe, se agrega al arreglo.
+          product.variations.push({ id: variationId, name: variationName, templates: templateObjects });
+        }
+      } else {
+        // Si no se envía variationId, se asignan las plantillas a nivel global.
+        product.templates = templateObjects;
+      }
     }
 
     await product.save();
@@ -83,10 +107,14 @@ export const getTemplatesByProduct = async (req, res, next) => {
     const product = await Product.findOne({ id: productId });
 
     if (!product) {
-        return res.status(404).json({ message: "Producto no encontrado" });
+      return res.status(404).json({ message: "Producto no encontrado" });
     }
 
-    res.json({ templates: product.templates || [] });
+    // Devolvemos tanto las plantillas globales como las variantes con sus plantillas asignadas.
+    res.json({
+      templates: product.templates || [],
+      variations: product.variations || [],
+    });
   } catch (error) {
     next(error);
   }

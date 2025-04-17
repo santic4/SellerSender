@@ -37,6 +37,7 @@
 
    Marcar como "Entregado": Una vez que se hayan enviado los mensajes, el producto se marcará automáticamente como entregado.
 
+   Este sistema es de pago. Para poder usarlo contactarse a "santisv4@gmail.com"
 
 ## Contribuciones
 

@@ -25,6 +25,7 @@ new Worker("webhookQueue", async (job) => {
         const result = await processWebhookNotification(topic, resource, accessToken);
 
         const orderExists = await checkExistingOrder(result);
+
         if (orderExists) {
             console.log("Orden ya procesada, ignorando webhook.");
             return;
@@ -42,7 +43,6 @@ new Worker("webhookQueue", async (job) => {
           console.error("⚠️ No se pudo marcar la entrega como completada:", err.message);
         }
       
-
         console.log("Orden guardada exitosamente.");
     } catch (error) {
         console.error("Error procesando el webhook en la cola:", error.message);

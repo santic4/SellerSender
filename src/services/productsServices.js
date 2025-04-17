@@ -62,7 +62,7 @@ class ProductServices{
                 console.log("Error al obtener el producto:", errorText);
                 throw new Error(`Error al obtener el producto con ID: ${itemID}`);
               }
-          
+
               const productData = await responseItem.json();
 
               return productData; 
@@ -71,11 +71,11 @@ class ProductServices{
 
             const productDetails = await Promise.all(productDetailsPromises);
      
-            console.log(productDetails,'product details')
             const productsSummary = productDetails.map(product => ({
               title: product.title,
               site_id: product.site_id,
-              id: product.id
+              id: product.id,
+              variations: product.variations
             }));
         
             return productsSummary; 
