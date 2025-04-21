@@ -40,15 +40,39 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
 
       const product = await Product.findOne({ id: item.item.id });
  
-      const templatesWithContent = await Promise.all(product.templates.map(async (template) => {
+      if (!product) {
+        throw new Error(`Producto con ID ${item.item.id} no encontrado`);
+      }
 
-        const templateDetails = await Template.findById(template.templateId);
 
-        return {
-          name: template.name,
-          content: templateDetails?.content,  
-        };
-      }));
+      let templatesWithContent = [];
+
+      // Buscar variaciones si existen
+      if (item.item.variation_id && Array.isArray(product.variations)) {
+        const variation = product.variations.find(v => v.id === String(item.item.variation_id));
+        if (variation && Array.isArray(variation.templates)) {
+          templatesWithContent = variation.templates.map(template => ({
+            name: template.name,
+            content: template.templateId ? template.templateId.content : null,
+          }));
+        }
+      }
+
+      console.log(templatesWithContent,'templatesWithContent1')
+
+      // Si no hay variaciones, usar plantillas globales
+      if (templatesWithContent.length === 0 && Array.isArray(product.templates)) {
+        templatesWithContent = await Promise.all(product.templates.map(async (template) => {
+          const templateDetails = await Template.findById(template.templateId);
+          return {
+            name: template.name,
+            content: templateDetails?.content || null,
+          };
+        }));
+      }
+
+      console.log(templatesWithContent,'templatesWithContent2')
+
 
       return {
         ...item,
@@ -98,6 +122,6 @@ export const fetchOrderDetails = async (orderId, accessToken) => {
   }
 
   const orderCaptured = await response.json();
-  console.log(orderCaptured,'orderCaptured')
+  
   return orderCaptured;
 };
