@@ -50,12 +50,20 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
       // Buscar variaciones si existen
       if (item.item.variation_id && Array.isArray(product.variations)) {
         const variation = product.variations.find(v => v.id === String(item.item.variation_id));
+        
+        console.log(variation,'variation 1')
         if (variation && Array.isArray(variation.templates)) {
-          templatesWithContent = variation.templates.map(template => ({
-            name: template.name,
-            content: template.templateId ? template.templateId.content : null,
-          }));
+          templatesWithContent = await Promise.all(
+            variation.templates.map(async tpl => {
+              const tplDoc = await Template.findById(tpl.templateId);
+              return {
+                name: tpl.name,
+                content: tplDoc?.content || null,
+              };
+            })
+          );
         }
+
       }
 
       console.log(templatesWithContent,'templatesWithContent1')
@@ -64,6 +72,9 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
       if (templatesWithContent.length === 0 && Array.isArray(product.templates)) {
         templatesWithContent = await Promise.all(product.templates.map(async (template) => {
           const templateDetails = await Template.findById(template.templateId);
+          
+          console.log(templateDetails,'templateDetails 1')
+
           return {
             name: template.name,
             content: templateDetails?.content || null,
