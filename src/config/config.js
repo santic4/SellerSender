@@ -13,3 +13,7 @@ export const CLIENT_ID = process.env.CLIENT_ID
 export const PORT = process.env.PORT
 
 export const CLIENT_ID_PERMITIDO = process.env.CLIENT_ID_PERMITIDO
+
+export const REACT_APP_PORT_REDIS = process.env.REACT_APP_PORT_REDIS
+
+export const REACT_APP_HOST_REDIS = process.env.REACT_APP_HOST_REDIS

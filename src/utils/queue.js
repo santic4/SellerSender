@@ -4,10 +4,11 @@ import { processWebhookNotification } from "../services/webhookService.js";
 import { checkExistingOrder, saveOrderServices } from "../services/paymentsServices.js";
 import { sendMessage } from "../services/messagesServices.js";
 import { deliveredService } from "../services/deliveredServices.js";
+import { REACT_APP_HOST_REDIS, REACT_APP_PORT_REDIS } from "../config/config.js";
 
 const redisConnection = {
-    host: "red-cvaak6ij1k6c73e4u3g0", 
-    port: 6379
+    host: REACT_APP_HOST_REDIS, 
+    port: REACT_APP_PORT_REDIS
 };
 
 // Crear la cola de trabajo para los webhooks
