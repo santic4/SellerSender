@@ -75,6 +75,7 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
           };
         }));
       }
+        console.log(templatesWithContent,'templatesWithContent en webhook services ')
 
       // Procesar secondMessages si existen
 

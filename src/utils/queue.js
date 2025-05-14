@@ -26,12 +26,15 @@ new Worker("webhookQueue", async (job) => {
         
         const result = await processWebhookNotification(topic, resource, accessToken);
 
+        console.log(result,'result antes de sress')
         const orderExists = await checkExistingOrder(result);
+        console.log(orderExists,'orderExists')
 
         if (orderExists) {
             console.log("Orden ya procesada, ignorando webhook.");
             return;
         }
+        console.log(result,'result antes de send message')
 
         await sendMessage(result, accessToken);
         console.log("Mensaje enviado.");
