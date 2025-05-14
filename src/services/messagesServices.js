@@ -86,18 +86,19 @@ async function uploadToMercadoLibre(fileUrl, accessToken) {
   
       const fileIdCache = {};
 
-      let secondMessages
-
       for (const item of result.items) {
         const product = item.product;
       
         for (const template of product.templates) {
           // 1) Convertir cada URL a file_id
           const attachmentsArray = [];
-          for (const url of template.attachments) {
-            const fileId = fileIdCache[url] || await uploadToMercadoLibre(url, accessToken);
-            fileIdCache[url] = fileId;
-            attachmentsArray.push({ id: fileId, type: 'image' });
+          
+          if (Array.isArray(template.attachments) && template.attachments.length > 0) {
+            for (const url of template.attachments) {
+              const fileId = fileIdCache[url] || await uploadToMercadoLibre(url, accessToken);
+              fileIdCache[url] = fileId;
+              attachmentsArray.push({ id: fileId, type: 'image' });
+            }
           }
         
           // 2) Construir el mensaje
