@@ -33,6 +33,44 @@ export const fetchPendingMessages = async (token) => {
     }
   };
 
+
+/**
+* Sube una imagen (o cualquier archivo) a MercadoLibre y devuelve el file_id resultante.
+*/
+
+async function uploadToMercadoLibre(fileUrl, accessToken) {
+  // 1) Descargamos el blob desde Firebase
+  const response = await fetch(fileUrl);
+  if (!response.ok) {
+    throw new Error(`No se pudo descargar la imagen: ${response.statusText}`);
+  }
+  const blob = await response.blob();
+  
+  // 2) Preparamos el FormData para ML
+  const form = new FormData();
+  form.append('file', blob, 'attachment.jpg');  // el nombre es arbitrario
+
+  // 3) Enviamos al endpoint de attachments
+  const mlResponse = await fetch(
+    'https://api.mercadolibre.com/messages/attachments',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: form
+    }
+  );
+  const mlData = await mlResponse.json();
+  if (!mlResponse.ok) {
+    throw new Error(`Error subiendo a ML: ${mlData.message}`);
+  }
+
+  // 4) Devolvemos el file_id
+  return mlData.id;  
+}
+
+
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
   
   export const sendMessage = async (result, accessToken) => {
@@ -43,19 +81,31 @@ export const fetchPendingMessages = async (token) => {
   
       const sellerId = await userServices.getInfoUserServices(accessToken);
 
-      console.log(sellerId, 'sellerId');
   
       const PACK_ID = result.pack_id ? result.pack_id : result.orderId;
   
+      const fileIdCache = {};
+
+      let secondMessages
+
       for (const item of result.items) {
         const product = item.product;
-  
+      
         for (const template of product.templates) {
+          // 1) Convertir cada URL a file_id
+          const attachmentsArray = [];
+          for (const url of template.attachments) {
+            const fileId = fileIdCache[url] || await uploadToMercadoLibre(url, accessToken);
+            fileIdCache[url] = fileId;
+            attachmentsArray.push({ id: fileId, type: 'image' });
+          }
+        
+          // 2) Construir el mensaje
           const message = {
             from: { user_id: sellerId },
-            to: { user_id: result.buyerId },
+            to:   { user_id: result.buyerId },
             text: template.content,
-            attachments: [],
+            attachments: attachmentsArray
           };
   
           console.log(`Enviando mensaje: "${template.content}"`);
@@ -94,3 +144,60 @@ export const fetchPendingMessages = async (token) => {
     }
   };
   
+
+export const sendSecondMessage = async (orderId, secondMessagesSend, packId, buyerId, accessToken) => {
+  try {
+
+    const sellerId = await userServices.getInfoUserServices(accessToken);
+
+    console.log(secondMessagesSend,'secondMessagesSend en send sendoc')
+
+    const fileIdCache = {};  
+    for (const item of secondMessagesSend) {
+    
+        // 1) Convertir cada URL a file_id
+        const attachmentsArray = [];
+        for (const url of item.attachments) {
+          const fileId = fileIdCache[url] || await uploadToMercadoLibre(url, accessToken);
+          fileIdCache[url] = fileId;
+          attachmentsArray.push({ id: fileId, type: 'image' });
+        }
+      
+        // 2) Construir el mensaje
+        const message = {
+          from: { user_id: sellerId },
+          to:   { user_id: buyerId },
+          text: item.content,
+          attachments: attachmentsArray
+        };
+    
+      console.log(`Enviando segundo mensaje: "${item.content}"`);  
+      // Enviar el mensaje de forma secuencial
+      const response = await fetch(
+        `https://api.mercadolibre.com/messages/packs/${packId}/sellers/${sellerId}?tag=post_sale`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'cache-control': 'no-cache',
+            'content-type': 'application/json',
+            'x-client-id': `${CLIENT_ID}`,
+          },
+          body: JSON.stringify(message),
+        }
+      );  
+      const data = await response.json();
+      if (response.ok) {
+        console.log(`Segundo mensaje enviado correctamente a ${buyerId}: "${item.content}"`);
+      } else {
+        console.error(`Error al enviar mensaje: ${data.message}`);
+      }
+      await delay(1000);
+    }
+
+    console.log('Todos los mensajes fueron enviados correctamente en el orden esperado.');
+  } catch (error) {
+    console.error('Error al procesar la notificación:', error.message);
+    throw error;
+  }
+};

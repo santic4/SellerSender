@@ -1,50 +1,115 @@
+import { Product } from '../models/Product.js';
 import { Template } from '../models/Template.js';
+import { templatesServices } from '../services/templatesServices.js';
 
-export const createTemplate = async (req, res) => {
+export const createTemplate = async (req, res, next) => {
   const { name, content, assignedPublications } = req.body;
-  console.log(name,'name,', content, 'content,', assignedPublications,'assignedPublications')
+  const { files } = req;
+  console.log(files,'files en create template')
   try {
-    const template = new Template({ name, content, assignedPublications });
+    let newImageUrls = [];
+
+    if (files) {
+      newImageUrls = await templatesServices.imageUploadFBService(files);
+      console.log(newImageUrls, 'imageUrlsCreate update controller');
+    }
+
+    const template = new Template({ name, content, assignedPublications, attachments: newImageUrls });
+    
     await template.save();
     res.status(201).json(template);
   } catch (error) {
-    console.error('Error al crear plantilla:', error);
-    res.status(500).send('Error al crear plantilla');
+    next(error)
   }
 };
 
-export const getTemplates = async (req, res) => {
+export const getTemplates = async (req, res, next) => {
   try {
-    const templates = await Template.find();
+    const templates = await templatesServices.getTemplatesServices();
+
     res.json(templates);
   } catch (error) {
-    console.error('Error al obtener plantillas:', error);
-    res.status(500).send('Error al obtener plantillas');
+    next(error)
+  }
+};
+
+export const assignSecondMessages = async (req, res, next) => {
+  const { productId } = req.params;
+  const { templateIds } = req.body;
+  
+  try {
+    console.log(templateIds,'templateIds')
+    const product = await Product.findOne({ id: productId });
+
+    if (!product) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    // 2) Si no envían nada o array vacío, dejamos secondMessages vacío
+    const secondArray = Array.isArray(templateIds)
+      ? templateIds.map(id => ({ templateId: id }))
+      : [];
+
+    // 3) Reemplazamos el array secondMessages
+    product.secondMessages = secondArray;
+
+    // 4) Guardamos cambios
+    const updated = await product.save();
+
+    // 5) Respondemos con el producto actualizado
+    return res.status(200).json(updated);
+    
+  } catch (error) {
+    next(error)
   }
 };
 
 export const updateTemplate = async (req, res, next) => {
-  const { id } = req.params; // id de la plantilla a actualizar
-  const { name, content, assignedPublications } = req.body; // datos a actualizar
+  const { id } = req.params;
+  const { files } = req;
+  const { name, content, assignedPublications, attachments: attachmentsRaw } = req.body;
 
   try {
-    console.log('entre')
-    // Buscar la plantilla por su id
-    const template = await Template.findById(id);
-    if (!template) {
-      return res.status(404).json({ message: "Plantilla no encontrada" });
+
+    // 1) Traer la plantilla existente
+    const template = await templatesServices.getTemplateByID(id);
+
+    // 2) Procesar attachments enviados desde el front (los que se quieren conservar)
+    const attachments = Array.isArray(attachmentsRaw)
+      ? attachmentsRaw
+      : JSON.parse(attachmentsRaw || '[]');
+
+    // 3) Identificar y eliminar imágenes que fueron eliminadas en el front
+    const oldAttachments = template.attachments || [];
+    const toDelete = oldAttachments.filter(url => !attachments.includes(url));
+
+ 
+    if (toDelete.length > 0) {
+      const ImagesDeleted = await templatesServices.imageDeleteFBService(toDelete);
+      console.log(ImagesDeleted, 'ImagesDeleted controller');
+    }
+     console.log(files, 'files in to controller');
+    // 4) Subir imágenes nuevas (si llegan en files)
+    let newImageUrls = [];
+    if (files) {
+      newImageUrls = await templatesServices.imageUploadFBService(files);
+      console.log(newImageUrls, 'imageUrlsFB update controller');
     }
 
-    // Actualizar los campos
-    template.name = name;
-    template.content = content;
-    // Se espera que assignedPublications sea un arreglo, en caso contrario se asigna un arreglo vacío
-    template.assignedPublications = Array.isArray(assignedPublications) ? assignedPublications : [];
+    const finalAttachments = [...attachments, ...newImageUrls];
 
-    // Guardar la plantilla actualizada
+    // 5) Actualizar campos de la plantilla
+    template.name                 = name;
+    template.content              = content;
+    template.assignedPublications = Array.isArray(assignedPublications)
+                                     ? assignedPublications
+                                     : [];
+    template.attachments          = finalAttachments;
+
+    // 6) Guardar y devolver
     const updatedTemplate = await template.save();
-
     res.status(200).json(updatedTemplate);
+
   } catch (error) {
     next(error);
   }

@@ -17,11 +17,8 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
     if(!orderId){
       throw new Error('No existe el orderId.')
     }
-    console.log(orderId,'orderId')
 
     const orderDetails = await fetchOrderDetails(orderId, accessToken);
-
-    console.log(orderDetails,'1 webhook services')
 
     // Filtrar si la orden fue creada antes del 10 de marzo de 2025
     const orderCreationDate = new Date(orderDetails.date_created);
@@ -32,11 +29,10 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
       return; 
     }
 
+    let allSecondMessages = [];
+
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
 
-      console.log(orderDetails.order_items.item,'orderDetails.order_items.item')
-      console.log(orderDetails.order_items[0].item,'orderDetails.order_items[0].item')
-      console.log(orderDetails.order_items,'orderDetails.order_items')
 
       const product = await Product.findOne({ id: item.item.id });
  
@@ -51,7 +47,6 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
       if (item.item.variation_id && Array.isArray(product.variations)) {
         const variation = product.variations.find(v => v.id === String(item.item.variation_id));
         
-        console.log(variation,'variation 1')
         if (variation && Array.isArray(variation.templates)) {
           templatesWithContent = await Promise.all(
             variation.templates.map(async tpl => {
@@ -63,18 +58,13 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
             })
           );
         }
-
       }
-
-      console.log(templatesWithContent,'templatesWithContent1')
 
       // Si no hay variaciones, usar plantillas globales
       if (templatesWithContent.length === 0 && Array.isArray(product.templates)) {
         templatesWithContent = await Promise.all(product.templates.map(async (template) => {
           const templateDetails = await Template.findById(template.templateId);
           
-          console.log(templateDetails,'templateDetails 1')
-
           return {
             name: template.name,
             content: templateDetails?.content || null,
@@ -82,8 +72,35 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
         }));
       }
 
-      console.log(templatesWithContent,'templatesWithContent2')
+      // Procesar secondMessages si existen
 
+      const lastTemplateIds = new Set();
+
+      if (Array.isArray(product.secondMessages) && product.secondMessages.length > 0) {
+
+        console.log(product.secondMessages,'product.secondMessages en webhook services ')
+        for (const sm of product.secondMessages) {
+
+          const templateIdStr = String(sm.templateId);
+
+          console.log(templateIdStr,' templateIDSTR webhook')
+
+          if (!lastTemplateIds.has(templateIdStr)) {
+            const tplDoc = await Template.findById(templateIdStr);
+            allSecondMessages.push({
+              templateId: templateIdStr,
+              name: tplDoc?.name,
+              content: tplDoc?.content || null,
+              attachments: tplDoc?.attachments || [], 
+            });
+
+            lastTemplateIds.add(templateIdStr);
+          } else {
+            console.log(`Template ${templateIdStr} ya incluida en secondMessages, omitiendo duplicado.`);
+          }
+
+        }
+      }
 
       return {
         ...item,
@@ -99,6 +116,7 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
       buyerId: orderDetails.buyer.id,
       packId: orderDetails.pack_id,
       items: itemsWithProductDetails,
+      secondMessages: allSecondMessages
     };
   } catch (error) {
     console.error('Error al procesar la notificación:', error.message);

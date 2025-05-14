@@ -24,7 +24,13 @@ const productSchema = new Schema({
       },
     ],
     default: [],
-  }, 
+  },  
+  secondMessages: [
+    {
+      templateId: { type: Schema.Types.ObjectId, ref: "Template" },
+      name: { type: String },
+    },
+  ],
 });
 
 export const Product = model('Product', productSchema);
