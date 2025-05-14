@@ -33,13 +33,16 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
 
     const itemsWithProductDetails = await Promise.all(orderDetails.order_items.map(async (item) => {
 
+            console.log(orderDetails.order_items.item,'orderDetails.order_items.item')
+      console.log(orderDetails.order_items[0].item,'orderDetails.order_items[0].item')
+      console.log(orderDetails.order_items,'orderDetails.order_items')
 
       const product = await Product.findOne({ id: item.item.id });
  
       if (!product) {
         throw new Error(`Producto con ID ${item.item.id} no encontrado`);
       }
-
+       console.log(product,'¡product 1')
 
       let templatesWithContent = [];
 
@@ -47,6 +50,7 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
       if (item.item.variation_id && Array.isArray(product.variations)) {
         const variation = product.variations.find(v => v.id === String(item.item.variation_id));
         
+        console.log(product,'¡product 2')
         if (variation && Array.isArray(variation.templates)) {
           templatesWithContent = await Promise.all(
             variation.templates.map(async tpl => {
@@ -131,10 +135,11 @@ export const processWebhookNotification = async (topic, resource, accessToken) =
  */
 export const fetchOrderDetails = async (orderId, accessToken) => {
 
+         console.log(orderId,'orderId2')
   if (!accessToken) {
     throw new Error('No se encontró el token de acceso. Asegúrate de estar autenticado.');
   }
-
+       console.log(orderId,'orderId3')
   const url = `https://api.mercadolibre.com/orders/${orderId}`;
 
   const response = await fetch(url, {

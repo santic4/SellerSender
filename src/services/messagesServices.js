@@ -82,6 +82,7 @@ async function uploadToMercadoLibre(fileUrl, accessToken) {
       const sellerId = await userServices.getInfoUserServices(accessToken);
 
   
+      console.log(result,'estoy en send message')
       const PACK_ID = result.pack_id ? result.pack_id : result.orderId;
   
       const fileIdCache = {};
