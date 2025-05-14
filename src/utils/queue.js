@@ -55,7 +55,7 @@ new Worker("webhookQueue", async (job) => {
             buyerId: result.buyerId
           },
           {
-            delay: 36 * 60 * 60 * 1000, // 36 horas
+            delay: 1 * 60 * 60 * 1000,
             attempts: 2, // Reintentos si falla
           }
         );
