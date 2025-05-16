@@ -34,7 +34,7 @@ new Worker("webhookQueue", async (job) => {
             console.log("Orden ya procesada, ignorando webhook.");
             return;
         }
-        console.log(result,'result antes de send message')
+        console.log(result,'orderExistsresultl')
 
         await sendMessage(result, accessToken);
         console.log("Mensaje enviado.");
@@ -47,6 +47,8 @@ new Worker("webhookQueue", async (job) => {
         } catch (err) {
           console.error("⚠️ No se pudo marcar la entrega como completada:", err.message);
         }
+
+        console.log('antes del delay')
 
         // ➕ NUEVO: Programar mensaje diferido a las 36hs
         await delayedMessageQueue.add(
@@ -73,6 +75,7 @@ new Worker("delayedMessageQueue", async (job) => {
     const { orderId, secondMessagesSend, packId, buyerId } = job.data;
   
     try {
+        console.log(orderId,' ORDERIDDELAY', secondMessagesSend,'SENDSECONDDELAY', packId, 'PACKIDDELAY', buyerId, 'BUYERIDDELAY')
       const accessToken = await getValidAccessToken();
   
       await sendSecondMessage( orderId, secondMessagesSend, packId, buyerId, accessToken );

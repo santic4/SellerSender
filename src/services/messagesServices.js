@@ -105,7 +105,7 @@ async function uploadToMercadoLibre(fileUrl, accessToken) {
           // 2) Construir el mensaje
           const message = {
             from: { user_id: sellerId },
-            to:   { user_id: result.buyerId },
+            to:   { user_id: result.buyerId }, 
             text: template.content,
             attachments: attachmentsArray
           };
