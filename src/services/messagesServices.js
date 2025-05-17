@@ -45,6 +45,8 @@ async function uploadToMercadoLibre(fileUrl, accessToken) {
     throw new Error(`No se pudo descargar la imagen: ${response.statusText}`);
   }
   const blob = await response.blob();
+
+  console.log(blob,'blob en upload')
   
   // 2) Preparamos el FormData para ML
   const form = new FormData();
@@ -62,6 +64,8 @@ async function uploadToMercadoLibre(fileUrl, accessToken) {
     }
   );
   const mlData = await mlResponse.json();
+
+  console.log(mlData,'ml data ')
   if (!mlResponse.ok) {
     throw new Error(`Error subiendo a ML: ${mlData.message}`);
   }
@@ -147,7 +151,7 @@ async function uploadToMercadoLibre(fileUrl, accessToken) {
   };
   
 
-export const sendSecondMessage = async (orderId, secondMessagesSend, packId, buyerId, accessToken) => {
+export const sendSecondMessage = async (orderId, secondMessagesSend, buyerId, accessToken) => {
   try {
 
     const sellerId = await userServices.getInfoUserServices(accessToken);
@@ -173,10 +177,10 @@ export const sendSecondMessage = async (orderId, secondMessagesSend, packId, buy
           attachments: attachmentsArray
         };
     
-      console.log(`Enviando segundo mensaje: "${item.content}"`);  
+      console.log(`Enviando segundo mensaje (antes): "${message}"`);  
       // Enviar el mensaje de forma secuencial
       const response = await fetch(
-        `https://api.mercadolibre.com/messages/packs/${packId}/sellers/${sellerId}?tag=post_sale`,
+        `https://api.mercadolibre.com/messages/packs/${orderId}/sellers/${sellerId}?tag=post_sale`,
         {
           method: 'POST',
           headers: {
@@ -189,6 +193,7 @@ export const sendSecondMessage = async (orderId, secondMessagesSend, packId, buy
         }
       );  
       const data = await response.json();
+      console.log(data,'DATA RE IMPORTANTE')
       if (response.ok) {
         console.log(`Segundo mensaje enviado correctamente a ${buyerId}: "${item.content}"`);
       } else {

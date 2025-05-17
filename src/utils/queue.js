@@ -56,7 +56,6 @@ new Worker("webhookQueue", async (job) => {
           {
             orderId: result.orderId, 
             secondMessagesSend: result.secondMessages,
-            packId: result.packId,
             buyerId: result.buyerId
           },
           {
@@ -72,15 +71,15 @@ new Worker("webhookQueue", async (job) => {
 }, { connection: redisConnection });
 
 new Worker("delayedMessageQueue", async (job) => {
-    const { orderId, secondMessagesSend, packId, buyerId } = job.data;
+    const { orderId, secondMessagesSend, buyerId } = job.data;
   
     try {
-        console.log(orderId,' ORDERIDDELAY', secondMessagesSend,'SENDSECONDDELAY', packId, 'PACKIDDELAY', buyerId, 'BUYERIDDELAY')
+        console.log(orderId,' ORDERIDDELAY', secondMessagesSend, 'PACKIDDELAY', buyerId, 'BUYERIDDELAY')
       const accessToken = await getValidAccessToken();
   
-      await sendSecondMessage( orderId, secondMessagesSend, packId, buyerId, accessToken );
+      const message = await sendSecondMessage( orderId, secondMessagesSend, buyerId, accessToken );
   
-      console.log("Mensaje retrasado enviado correctamente.");
+      console.log("Mensaje retrasado enviado correctamente.",message);
     } catch (err) {
       console.error("❌ Error enviando mensaje retrasado:", err.message);
     }
