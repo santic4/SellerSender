@@ -169,15 +169,18 @@ export const sendSecondMessage = async (orderId, secondMessagesSend, buyerId, ac
           attachmentsArray.push({ id: fileId, type: 'image' });
         }
       
+        console.log(item.content,' itemcontenttt')
         // 2) Construir el mensaje
-        const message = {
-          from: { user_id: sellerId },
-          to:   { user_id: buyerId },
+        const message = {  
+          from: { user_id: Number(sellerId) },
+          to:   { user_id: Number(buyerId) },
           text: item.content,
           attachments: attachmentsArray
         };
     
       console.log(`Enviando segundo mensaje (antes): "${message}"`);  
+      console.log("Enviando segundo mensaje (antesparsing):", JSON.stringify(message, null, 2));
+      console.log(sellerId,' SELLERIDDD')
       // Enviar el mensaje de forma secuencial
       const response = await fetch(
         `https://api.mercadolibre.com/messages/packs/${orderId}/sellers/${sellerId}?tag=post_sale`,
