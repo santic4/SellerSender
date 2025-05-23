@@ -161,21 +161,33 @@ export const sendSecondMessage = async (orderId, secondMessagesSend, buyerId, ac
     const fileIdCache = {};  
     for (const item of secondMessagesSend) {
     
-        // 1) Convertir cada URL a file_id
-        const attachmentsArray = [];
-        for (const url of item.attachments) {
-          const fileId = fileIdCache[url] || await uploadToMercadoLibre(url, accessToken);
-          fileIdCache[url] = fileId;
-          attachmentsArray.push({ id: fileId, type: 'image' });
-        }
+      const attachmentsArray = [];
+
+      for (const url of item.attachments) {
+        const fileId = fileIdCache[url] || await uploadToMercadoLibre(url, accessToken);
+        fileIdCache[url] = fileId;
+        attachmentsArray.push(fileId); 
+      }
+
+      console.log(attachmentsArray,'ATTDDDD')
+
+      // 2) Verificar y convertir sellerId y buyerId a string si es necesario
+      const sellerIdStr = typeof sellerId === 'string' ? sellerId : String(sellerId);
+      const buyerIdStr = typeof buyerId === 'string' ? buyerId : String(buyerId);
       
-        console.log(item.content,' itemcontenttt')
-        // 2) Construir el mensaje
-        const message = {  
-          text: item.content,
+      console.log(sellerIdStr,'sellerIdStrDDDD',buyerIdStr,'buyerIdStrDDDD')
+
+      // 3) Construir el mensaje
+      const message = {  
+        from: {
+          user_id: sellerIdStr
+        },
+        to: {
+          user_id: buyerIdStr
+        },
+        text: item.content,
         ...(attachmentsArray.length > 0 && { attachments: attachmentsArray })
-        };
-    
+      };
       console.log("Enviando segundo mensaje (antesparsing):", JSON.stringify(message, null, 2));
 
       // Enviar el mensaje de forma secuencial
