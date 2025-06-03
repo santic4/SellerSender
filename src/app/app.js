@@ -16,13 +16,14 @@ const app = express();
 app.use(cookieParser());
 app.use(express.static(path.join('public', 'build')));
 
+// 
 app.use(cors({
-    origin: 'https://sellersender.onrender.com/',
+    origin: 'https://sellersender.onrender.com',
     credentials: true 
 }));
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://sellersender.onrender.com/');
+    res.header('Access-Control-Allow-Origin', 'https://sellersender.onrender.com');
     res.header('Access-Control-Allow-Credentials', 'true');
     next();
 });

@@ -156,8 +156,6 @@ export const sendSecondMessage = async (orderId, secondMessagesSend, buyerId, ac
 
     const sellerId = await userServices.getInfoUserServices(accessToken);
 
-    console.log(secondMessagesSend,'secondMessagesSend en send sendoc')
-
     const fileIdCache = {};  
     for (const item of secondMessagesSend) {
     
@@ -169,13 +167,9 @@ export const sendSecondMessage = async (orderId, secondMessagesSend, buyerId, ac
         attachmentsArray.push(fileId); 
       }
 
-      console.log(attachmentsArray,'ATTDDDD')
-
       // 2) Verificar y convertir sellerId y buyerId a string si es necesario
       const sellerIdStr = typeof sellerId === 'string' ? sellerId : String(sellerId);
       const buyerIdStr = typeof buyerId === 'string' ? buyerId : String(buyerId);
-      
-      console.log(sellerIdStr,'sellerIdStrDDDD',buyerIdStr,'buyerIdStrDDDD')
 
       // 3) Construir el mensaje
       const message = {  
@@ -205,7 +199,7 @@ export const sendSecondMessage = async (orderId, secondMessagesSend, buyerId, ac
         }
       );  
       const data = await response.json();
-      console.log(data,'DATA RE IMPORTANTE')
+  
       if (response.ok) {
         console.log(`Segundo mensaje enviado correctamente a ${buyerId}: "${item.content}"`);
       } else {

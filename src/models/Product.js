@@ -31,6 +31,7 @@ const productSchema = new Schema({
       name: { type: String },
     },
   ],
+  secondMessageDelay: { type: Number, default: 36 },
 });
 
 export const Product = model('Product', productSchema);

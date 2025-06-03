@@ -45,12 +45,31 @@ export const assignSecondMessages = async (req, res, next) => {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
 
-    // 2) Si no envían nada o array vacío, dejamos secondMessages vacío
-    const secondArray = Array.isArray(templateIds)
-      ? templateIds.map(id => ({ templateId: id }))
-      : [];
+    console.log('PORACA')
+    let secondArray = [];
 
-    // 3) Reemplazamos el array secondMessages
+    if (Array.isArray(templateIds) && templateIds.length > 0) {
+      // 1) Buscamos todos los Template cuyo _id esté en templateIds
+      const templatesDocs = await Template.find({ 
+        _id: { $in: templateIds } 
+      }).select('name'); // solo traemos el campo name (y _id)
+
+      // 2) Creamos un mapa { id: TemplateDoc } para mantener orden
+      const templateMap = {};
+      templatesDocs.forEach(t => {
+        templateMap[t._id.toString()] = t;
+      });
+
+      // 3) Recorremos templateIds en el mismo orden que vienen en el body
+      secondArray = templateIds.map(id => {
+        const tDoc = templateMap[id];
+        return {
+          templateId: id,
+          name: tDoc ? tDoc.name : '' // si no se encuentra, queda vacío
+        };
+      });
+    }
+
     product.secondMessages = secondArray;
 
     // 4) Guardamos cambios

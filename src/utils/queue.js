@@ -15,7 +15,7 @@ const redisConnection = {
 export const webhookQueue = new Queue("webhookQueue", { connection: redisConnection });
 const delayedMessageQueue = new Queue("delayedMessageQueue", { connection: redisConnection });
 
-// Definir el Worker para procesar las tareas en segundo plano
+// Worker para procesar las tareas principales
 new Worker("webhookQueue", async (job) => {
     const { topic, resource } = job.data;
     
@@ -70,6 +70,7 @@ new Worker("webhookQueue", async (job) => {
     }
 }, { connection: redisConnection });
 
+// Worker para procesar las tareas del delay messages
 new Worker("delayedMessageQueue", async (job) => {
     const { orderId, secondMessagesSend, buyerId } = job.data;
   

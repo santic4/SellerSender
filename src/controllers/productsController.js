@@ -92,7 +92,10 @@ export const asignTemplate = async (req, res, next) => {
 
 export const getSavedProducts = async (req, res, next) => {
   try {
-    const products = await Product.find().populate("templates.templateId");
+    const products = await Product.find()
+      .populate("templates.templateId")
+      .populate("secondMessages.templateId")
+      .populate("secondMessages.name")
 
     res.status(200).json(products);
   } catch (error) {
@@ -135,6 +138,27 @@ export const deleteTemplate = async (req, res, next) => {
     await product.save();
 
     res.status(200).json({ message: "Plantilla eliminada correctamente." });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteSecondTemplate = async (req, res, next) => {
+  const { productId, templateId } = req.params;
+
+  try {
+    const product = await Product.findOne({ id: productId });
+
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado." });
+    }
+
+    product.secondMessages = product.secondMessages.filter((template) => template.templateId.toString() !== templateId);
+
+    console.log(product.secondMessages, 'SEGUNDOO')
+    await product.save();
+
+    res.status(200).json({ message: "Segunda plantilla eliminada correctamente." });
   } catch (error) {
     next(error);
   }
@@ -263,5 +287,61 @@ export const reorderTemplateInProduct = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
+  }
+};
+
+export const delayAsign = async (req, res, next) => {
+  const { productId } = req.params;
+  const { delayHours } = req.body;
+
+  try {
+    // Validaciones básicas
+    if (typeof delayHours !== 'number' || delayHours < 1 || delayHours > 72) {
+      return res.status(400).json({
+        error: 'delayHours debe ser un número entre 1 y 72'
+      });
+    }
+
+    // Buscamos el producto por su campo “id” (no el _id de Mongo)
+    const product = await Product.findOne({ id: productId });
+    if (!product) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    // Asignamos el nuevo valor
+    product.secondMessageDelay = delayHours;
+
+    // Guardamos
+    await product.save();
+
+    return res.status(200).json({
+      message: 'secondMessageDelay actualizado',
+      secondMessageDelay: product.secondMessageDelay
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const getProductById = async (req, res, next) => {
+  const { productId } = req.params;
+
+  try {    console.log(productId,' productId')
+
+    // Busca el producto por su _id:
+    const producto = await Product.findOne({id: productId}).lean();
+    console.log(producto,' PRRRRR')
+    if (!producto) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    // Si sólo interesa enviar secondMessageDelay:
+    // return res.json({ secondMessageDelay: producto.secondMessageDelay });
+
+    return res.json(producto);
+  } catch (err) {
+    console.error("Error en getProductById:", err);
+    next()
   }
 };
