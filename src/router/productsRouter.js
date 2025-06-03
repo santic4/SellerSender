@@ -14,4 +14,5 @@ productsRouter.post("/:productId/assign-template", addTemplateToProduct);
 productsRouter.patch("/:productId/templates/reorder", reorderTemplateInProduct);
 productsRouter.delete("/:productId/saved-product", deleteProductAsign);
 productsRouter.get("/:productId/refetch-id", getProductById);
+
 export default productsRouter;

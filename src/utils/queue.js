@@ -48,7 +48,7 @@ new Worker("webhookQueue", async (job) => {
           console.error("⚠️ No se pudo marcar la entrega como completada:", err.message);
         }
 
-        console.log('antes del delay')
+        const delayAsign = result.secondMessageDelay || 24;
 
         // ➕ NUEVO: Programar mensaje diferido a las 36hs
         await delayedMessageQueue.add(
@@ -59,7 +59,7 @@ new Worker("webhookQueue", async (job) => {
             buyerId: result.buyerId
           },
           {
-            delay: 1 * 60 * 60 * 1000,
+            delay: delayAsign * 60 * 60 * 1000,
             attempts: 2, // Reintentos si falla
           }
         );
