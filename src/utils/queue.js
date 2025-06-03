@@ -49,6 +49,7 @@ new Worker("webhookQueue", async (job) => {
         }
 
         const delayAsign = result.secondMessageDelay || 24;
+        console.log(delayAsign, 'delayAsignNNNNNn')
 
         // ➕ NUEVO: Programar mensaje diferido a las 36hs
         await delayedMessageQueue.add(
@@ -74,6 +75,7 @@ new Worker("webhookQueue", async (job) => {
 new Worker("delayedMessageQueue", async (job) => {
     const { orderId, secondMessagesSend, buyerId } = job.data;
   
+    console.log('ENTREALSECONDBIENNN')
     try {
         console.log(orderId,' ORDERIDDELAY', secondMessagesSend, 'PACKIDDELAY', buyerId, 'BUYERIDDELAY')
       const accessToken = await getValidAccessToken();
