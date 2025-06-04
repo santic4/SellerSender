@@ -51,7 +51,7 @@ new Worker("webhookQueue", async (job) => {
         const delayAsign = result.secondMessageDelay || 24;
         console.log(delayAsign, 'delayAsignNNNNNn')
 
-        // ➕ NUEVO: Programar mensaje diferido a las 36hs
+        // ➕ NUEVO: Programar mensaje diferido
         await delayedMessageQueue.add(
           "sendSecondMessage",
           {

@@ -133,3 +133,20 @@ export const updateTemplate = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteTemplate = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const deletedTemplate = await Template.findByIdAndDelete(id);
+
+    if (!deletedTemplate) {
+      return res.status(404).json({ message: 'Plantilla no encontrada' });
+    }
+
+    res.status(200).json({ message: 'Plantilla eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar la plantilla:', error);
+    next()
+  }
+};

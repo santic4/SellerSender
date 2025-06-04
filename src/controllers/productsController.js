@@ -155,7 +155,7 @@ export const deleteSecondTemplate = async (req, res, next) => {
 
     product.secondMessages = product.secondMessages.filter((template) => template.templateId.toString() !== templateId);
 
-    console.log(product.secondMessages, 'SEGUNDOO')
+
     await product.save();
 
     res.status(200).json({ message: "Segunda plantilla eliminada correctamente." });
@@ -327,18 +327,14 @@ export const delayAsign = async (req, res, next) => {
 export const getProductById = async (req, res, next) => {
   const { productId } = req.params;
 
-  try {    console.log(productId,' productId')
-
-    // Busca el producto por su _id:
+  try {
+    // Busca el producto por su id:
     const producto = await Product.findOne({id: productId}).lean();
     console.log(producto,' PRRRRR')
     if (!producto) {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
-
-    // Si sólo interesa enviar secondMessageDelay:
-    // return res.json({ secondMessageDelay: producto.secondMessageDelay });
-
+    
     return res.json(producto);
   } catch (err) {
     console.error("Error en getProductById:", err);
