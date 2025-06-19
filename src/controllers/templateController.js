@@ -5,8 +5,24 @@ import { templatesServices } from '../services/templatesServices.js';
 export const createTemplate = async (req, res, next) => {
   const { name, content, assignedPublications } = req.body;
   const { files } = req;
-  console.log(files,'files en create template')
+
   try {
+    let filterContent = content;
+    // normalizo saltos de línea
+    const normalized = filterContent.replace(/\r\n/g, '\n');
+
+    console.log(`Caracteres (normalizado): ${normalized.length}`);  // aquí debería dar 344
+
+    // si además querés validar longitud máxima:
+    if (normalized.length > 350) {
+      return res
+        .status(400)
+        .json({ error: 'El contenido supera el límite de 350 caracteres.' });
+    }
+
+    // y si quieres guardar el contenido normalizado en la DB:
+    filterContent = normalized;
+
     let newImageUrls = [];
 
     if (files) {
@@ -14,9 +30,10 @@ export const createTemplate = async (req, res, next) => {
       console.log(newImageUrls, 'imageUrlsCreate update controller');
     }
 
-    const template = new Template({ name, content, assignedPublications, attachments: newImageUrls });
-    
+    const template = new Template({ name, content: filterContent, assignedPublications, attachments: newImageUrls });
+
     await template.save();
+
     res.status(201).json(template);
   } catch (error) {
     next(error)
@@ -86,40 +103,65 @@ export const assignSecondMessages = async (req, res, next) => {
 export const updateTemplate = async (req, res, next) => {
   const { id } = req.params;
   const { files } = req;
-  const { name, content, assignedPublications, attachments: attachmentsRaw } = req.body;
+  const { name, content, assignedPublications, attachmentsRaw } = req.body;
 
   try {
 
     // 1) Traer la plantilla existente
     const template = await templatesServices.getTemplateByID(id);
 
+    console.log(template,'TEMPLATE2')
+    console.log(attachmentsRaw,'attachmentsRaw2')
     // 2) Procesar attachments enviados desde el front (los que se quieren conservar)
     const attachments = Array.isArray(attachmentsRaw)
       ? attachmentsRaw
       : JSON.parse(attachmentsRaw || '[]');
 
+      console.log(attachments,'attachments3')
+
     // 3) Identificar y eliminar imágenes que fueron eliminadas en el front
     const oldAttachments = template.attachments || [];
-    const toDelete = oldAttachments.filter(url => !attachments.includes(url));
+    const toDelete = oldAttachments.filter(url => attachments.includes(url));
 
+    console.log(toDelete,'toDelete3')
+    console.log(oldAttachments,'oldAttachments4')
  
     if (toDelete.length > 0) {
       const ImagesDeleted = await templatesServices.imageDeleteFBService(toDelete);
-      console.log(ImagesDeleted, 'ImagesDeleted controller');
+      console.log(ImagesDeleted,'ImagesDeleted3')
     }
-     console.log(files, 'files in to controller');
     // 4) Subir imágenes nuevas (si llegan en files)
     let newImageUrls = [];
     if (files) {
       newImageUrls = await templatesServices.imageUploadFBService(files);
-      console.log(newImageUrls, 'imageUrlsFB update controller');
     }
 
-    const finalAttachments = [...attachments, ...newImageUrls];
+    console.log(newImageUrls,'newImageUrls3')
+
+    const finalAttachments = [...oldAttachments, ...newImageUrls];
+
+    console.log(finalAttachments,'finalAttachments3')
+
+    // Normalizo content 
+    let filterContent = content;
+    // normalizo saltos de línea
+    const normalized = filterContent.replace(/\r\n/g, '\n');
+
+    console.log(`Caracteres (normalizado): ${normalized.length}`);  // aquí debería dar 344
+
+    // si además querés validar longitud máxima:
+    if (normalized.length > 350) {
+      return res
+        .status(400)
+        .json({ error: 'El contenido supera el límite de 350 caracteres.' });
+    }
+
+    // y si quieres guardar el contenido normalizado en la DB:
+    filterContent = normalized;
 
     // 5) Actualizar campos de la plantilla
     template.name                 = name;
-    template.content              = content;
+    template.content              = filterContent;
     template.assignedPublications = Array.isArray(assignedPublications)
                                      ? assignedPublications
                                      : [];
@@ -127,6 +169,8 @@ export const updateTemplate = async (req, res, next) => {
 
     // 6) Guardar y devolver
     const updatedTemplate = await template.save();
+
+    console.log(updatedTemplate,'updatedTemplate2')
     res.status(200).json(updatedTemplate);
 
   } catch (error) {
