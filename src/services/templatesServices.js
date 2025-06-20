@@ -26,9 +26,9 @@ class TemplatesServices{
 
     async imageUploadFBService(files){
 
-        console.log(files,' filesupload FB en services')
+        console.log(files,' filesupload FB en services!')
         const imageFiles = files['images-posventa'] || [];
-
+     console.log(imageFiles,' imageFiles FB en services!')
         const imageUrls = [];
 
         // Subir imágenes a Firebase Storage

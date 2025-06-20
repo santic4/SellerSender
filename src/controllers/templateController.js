@@ -107,29 +107,31 @@ export const updateTemplate = async (req, res, next) => {
 
   try {
 
+    console.log(files,'files')
+
     // 1) Traer la plantilla existente
     const template = await templatesServices.getTemplateByID(id);
 
     console.log(template,'TEMPLATE2')
     console.log(attachmentsRaw,'attachmentsRaw2')
-    // 2) Procesar attachments enviados desde el front (los que se quieren conservar)
-    const attachments = Array.isArray(attachmentsRaw)
-      ? attachmentsRaw
-      : JSON.parse(attachmentsRaw || '[]');
-
-      console.log(attachments,'attachments3')
 
     // 3) Identificar y eliminar imágenes que fueron eliminadas en el front
     const oldAttachments = template.attachments || [];
-    const toDelete = oldAttachments.filter(url => attachments.includes(url));
+    const toDelete = oldAttachments.filter(url => attachmentsRaw.includes(url));
 
-    console.log(toDelete,'toDelete3')
-    console.log(oldAttachments,'oldAttachments4')
- 
+    console.log(toDelete,'TEDELETEEEE')
+    let remainingAttachments
+
     if (toDelete.length > 0) {
       const ImagesDeleted = await templatesServices.imageDeleteFBService(toDelete);
+      
       console.log(ImagesDeleted,'ImagesDeleted3')
+      remainingAttachments = oldAttachments.filter(url => !toDelete.includes(url));
+      console.log(remainingAttachments,'remainingAttachments3')
+    }else{
+      remainingAttachments = oldAttachments;
     }
+
     // 4) Subir imágenes nuevas (si llegan en files)
     let newImageUrls = [];
     if (files) {
@@ -138,7 +140,7 @@ export const updateTemplate = async (req, res, next) => {
 
     console.log(newImageUrls,'newImageUrls3')
 
-    const finalAttachments = [...oldAttachments, ...newImageUrls];
+    const finalAttachments = [...remainingAttachments, ...newImageUrls];
 
     console.log(finalAttachments,'finalAttachments3')
 
@@ -182,11 +184,15 @@ export const deleteTemplate = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    const deletedTemplate = await Template.findByIdAndDelete(id);
+    const template = await Template.findById(id);
 
-    if (!deletedTemplate) {
-      return res.status(404).json({ message: 'Plantilla no encontrada' });
-    }
+    if(!template) throw new Error('Plantilla no encontrada');
+
+    const templateImagesToDelete = template?.attachments;
+
+    await templatesServices.imageDeleteFBService(templateImagesToDelete);
+
+    await Template.findByIdAndDelete(id);
 
     res.status(200).json({ message: 'Plantilla eliminada correctamente' });
   } catch (error) {
