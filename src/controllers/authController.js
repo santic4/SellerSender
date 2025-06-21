@@ -27,9 +27,8 @@ export const callback = async (req, res) => {
     });
 
     console.log('Status token URL:', response.status, response.statusText);
-const text = await response.text();
-console.log('Body token URL (raw):', text);
 
+    console.log('prev', response)
     if (!response.ok) {
       console.error('Error al obtener el token:', response.statusText);
       return res.status(response.status).json({ error: 'No se pudo autenticar' });
