@@ -4,7 +4,7 @@ import { tokenServices } from "../services/testServices.js";
 
 export const getAuthUrl = (req, res) => {
 
-  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=773115281378041&redirect_uri=${REDIRECT_URI}`;
+  const authUrl = `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
 
   res.json({ authUrl });
 };
@@ -19,12 +19,16 @@ export const callback = async (req, res) => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: '773115281378041',
+        client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
         code,
         redirect_uri: REDIRECT_URI,
       }),
     });
+
+    console.log('Status token URL:', response.status, response.statusText);
+const text = await response.text();
+console.log('Body token URL (raw):', text);
 
     if (!response.ok) {
       console.error('Error al obtener el token:', response.statusText);
