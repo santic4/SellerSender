@@ -19,7 +19,7 @@ export const callback = async (req, res) => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
-        client_id: CLIENT_ID,
+        client_id: '773115281378041',
         client_secret: CLIENT_SECRET,
         code,
         redirect_uri: REDIRECT_URI,
