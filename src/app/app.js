@@ -16,7 +16,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.static(path.join('public', 'build')));
 
-// 
+// https://sellersender.onrender.com/
 app.use(cors({
     origin: 'https://sellersender.onrender.com/',
     credentials: true 

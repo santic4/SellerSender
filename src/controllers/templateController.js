@@ -11,8 +11,6 @@ export const createTemplate = async (req, res, next) => {
     // normalizo saltos de línea
     const normalized = filterContent.replace(/\r\n/g, '\n');
 
-    console.log(`Caracteres (normalizado): ${normalized.length}`);  // aquí debería dar 344
-
     // si además querés validar longitud máxima:
     if (normalized.length > 350) {
       return res
@@ -27,7 +25,6 @@ export const createTemplate = async (req, res, next) => {
 
     if (files) {
       newImageUrls = await templatesServices.imageUploadFBService(files);
-      console.log(newImageUrls, 'imageUrlsCreate update controller');
     }
 
     const template = new Template({ name, content: filterContent, assignedPublications, attachments: newImageUrls });
@@ -55,14 +52,12 @@ export const assignSecondMessages = async (req, res, next) => {
   const { templateIds } = req.body;
   
   try {
-    console.log(templateIds,'templateIds')
     const product = await Product.findOne({ id: productId });
 
     if (!product) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
 
-    console.log('PORACA')
     let secondArray = [];
 
     if (Array.isArray(templateIds) && templateIds.length > 0) {
@@ -107,49 +102,39 @@ export const updateTemplate = async (req, res, next) => {
 
   try {
 
-    console.log(files,'files')
-
     // 1) Traer la plantilla existente
     const template = await templatesServices.getTemplateByID(id);
-
-    console.log(template,'TEMPLATE2')
-    console.log(attachmentsRaw,'attachmentsRaw2')
 
     // 3) Identificar y eliminar imágenes que fueron eliminadas en el front
     const oldAttachments = template.attachments || [];
     const toDelete = oldAttachments.filter(url => attachmentsRaw.includes(url));
-
-    console.log(toDelete,'TEDELETEEEE')
+   console.log(attachmentsRaw,'attachmentsRawDDD')
     let remainingAttachments
 
     if (toDelete.length > 0) {
       const ImagesDeleted = await templatesServices.imageDeleteFBService(toDelete);
       
-      console.log(ImagesDeleted,'ImagesDeleted3')
       remainingAttachments = oldAttachments.filter(url => !toDelete.includes(url));
-      console.log(remainingAttachments,'remainingAttachments3')
+   
+      console.log(ImagesDeleted,'IMAGESDELETEDDD')
     }else{
       remainingAttachments = oldAttachments;
+      console.log(remainingAttachments,'remainingAttachmentsDENTRODEELSE')
     }
-
+      console.log(remainingAttachments,'remainingAttachmentsDDD')
     // 4) Subir imágenes nuevas (si llegan en files)
     let newImageUrls = [];
     if (files) {
+      console.log(files,'filesDDD')
       newImageUrls = await templatesServices.imageUploadFBService(files);
     }
-
-    console.log(newImageUrls,'newImageUrls3')
-
+console.log(newImageUrls,'newImageUrlsDDD2')
     const finalAttachments = [...remainingAttachments, ...newImageUrls];
-
-    console.log(finalAttachments,'finalAttachments3')
-
+console.log(finalAttachments,'finalAttachmentsDDD')
     // Normalizo content 
     let filterContent = content;
     // normalizo saltos de línea
     const normalized = filterContent.replace(/\r\n/g, '\n');
-
-    console.log(`Caracteres (normalizado): ${normalized.length}`);  // aquí debería dar 344
 
     // si además querés validar longitud máxima:
     if (normalized.length > 350) {
@@ -172,7 +157,6 @@ export const updateTemplate = async (req, res, next) => {
     // 6) Guardar y devolver
     const updatedTemplate = await template.save();
 
-    console.log(updatedTemplate,'updatedTemplate2')
     res.status(200).json(updatedTemplate);
 
   } catch (error) {
