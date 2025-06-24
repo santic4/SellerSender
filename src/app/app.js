@@ -18,12 +18,12 @@ app.use(express.static(path.join('public', 'build')));
 
 // https://sellersender.onrender.com/
 app.use(cors({
-    origin: 'https://sellersender.onrender.com/',
+    origin: 'https://flowsell.site/',
     credentials: true 
 }));
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://sellersender.onrender.com/');
+    res.header('Access-Control-Allow-Origin', 'https://flowsell.site/');
     res.header('Access-Control-Allow-Credentials', 'true');
     next();
 });
