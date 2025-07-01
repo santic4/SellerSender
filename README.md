@@ -15,7 +15,7 @@
 
 1. Cloná el repositorio:
 
-   git clone https://github.com/tu-usuario/SellerSender.git
+   git clone https://github.com/santic4/SellerSender.git
 
 2. Instalá las dependencias:
 
